@@ -1,0 +1,18 @@
+<%- include('../../partials/adminHeader', { title: "Progress" }) %>
+
+<div class="container mt-4">
+<h3>Student Progress</h3>
+
+<table class="table">
+<tr><th>User</th><th>Lesson</th><th>Score</th></tr>
+
+<% progress.forEach(p=>{ %>
+<tr>
+<td><%= p.user.firstName %></td>
+<td><%= p.lesson.title %></td>
+<td><%= p.score %></td>
+</tr>
+<% }) %>
+
+</table>
+</div>

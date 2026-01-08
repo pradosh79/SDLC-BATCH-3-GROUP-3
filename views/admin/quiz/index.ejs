@@ -1,0 +1,104 @@
+<%- include('../../partials/adminHeader', { title: "Quiz" }) %>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <!-- Page Content -->
+            <div class="container mt-4">
+
+                <h3 class="mb-4">Add Quiz Question</h3>
+
+                <form method="POST" action="/admin/quiz/create" class="card p-3 mb-4">
+
+                    <input type="hidden" name="lessonId" value="<%= lessonId %>">
+
+                    <div class="mb-3">
+                        <label>Question</label>
+                        <input class="form-control" name="question" placeholder="Enter question" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Option A</label>
+                            <input class="form-control" name="a" placeholder="Option A" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Option B</label>
+                            <input class="form-control" name="b" placeholder="Option B" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Option C</label>
+                            <input class="form-control" name="c" placeholder="Option C" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Option D</label>
+                            <input class="form-control" name="d" placeholder="Option D" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Correct Option Index (0-3)</label>
+                        <!-- <input class="form-control" name="correct" placeholder="Example: 1" required> -->
+                        <label>Correct Option</label>
+                            <select class="form-control" name="correct" required>
+                            <option value="0">Option A</option>
+                            <option value="1">Option B</option>
+                            <option value="2">Option C</option>
+                            <option value="3">Option D</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary">Add Question</button>
+                </form>
+
+                <h4>Question List</h4>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Correct</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% quiz.forEach(q => { %>
+                        <tr>
+                            <td><%= q.question %></td>
+                            <td>Option <%= ['A','B','C','D'][q.correctAnswer] %></td>
+                            <td>
+                                <a class="btn btn-sm btn-danger"
+                                   href="/admin/quiz/delete/<%= q._id %>"
+                                   onclick="return confirm('Delete this question?')">
+                                   Delete
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../partials/adminFooter') %>
+
+    </div>
+</div>

@@ -1,0 +1,97 @@
+<%- include('../../partials/adminHeader', { title: "Create User" }) %>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <!-- Page Content -->
+            <div class="container mt-4">
+                <h3>Create User</h3>
+
+                <form action="/admin/users/create" method="POST">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>First Name</label>
+                            <input class="form-control" name="firstName" placeholder="First Name" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Last Name</label>
+                            <input class="form-control" name="lastName" placeholder="Last Name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input class="form-control" name="email" placeholder="Email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        <input class="form-control" name="phone" placeholder="Phone">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Role</label>
+                        <select name="role" id="role" class="form-control" onchange="toggleTeacherFields()">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <!-- Teacher Only Fields -->
+                    <div id="teacherFields" style="display:none">
+
+                        <div class="mb-3">
+                            <label>Subject Taught</label>
+                            <input class="form-control" name="subjectTaught" placeholder="Subject">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Institution</label>
+                            <input class="form-control" name="institution" placeholder="Institution">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Years of Experience</label>
+                            <input type="number" class="form-control" name="yearsOfExperience" placeholder="Experience">
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <input type="password" class="form-control" name="password" placeholder="Password" required>
+                    </div>
+
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../partials/adminFooter') %>
+
+    </div>
+</div>
+
+<script>
+function toggleTeacherFields(){
+    const role = document.getElementById("role").value;
+    document.getElementById("teacherFields").style.display =
+        role === "teacher" ? "block" : "none";
+}
+</script>

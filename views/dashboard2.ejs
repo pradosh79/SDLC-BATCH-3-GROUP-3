@@ -1,0 +1,23 @@
+<%- include('../partials/header', { title }) %>
+
+<div id="wrapper">
+
+    <%- include('../partials/adminSidebar', { user: user }) %>
+
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            <%- include('../partials/adminNavbar', { user: user }) %>
+
+            <div class="container-fluid">
+
+                <h1 class="h3 mb-4 text-gray-800">Welcome, <%= user.name %></h1>
+
+            </div>
+
+        </div>
+
+        <%- include('../partials/footer') %>
+    </div>
+
+</div>

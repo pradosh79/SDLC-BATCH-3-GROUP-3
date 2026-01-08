@@ -1,0 +1,118 @@
+<%- include('../../partials/adminHeader', { title: "Users" }) %>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <div class="container-fluid mt-4">
+
+  <div class="d-flex justify-content-between mb-3">
+    <h3>Users List</h3>
+    <a href="/admin/users/create" class="btn btn-primary">Add User</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+
+      <table class="table table-bordered mb-0" id="dataTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if (users && users.length) { %>
+            <% users.forEach(user => { %>
+              <tr>
+                <td><%= user.firstName %> <%= user.lastName %></td>
+                <td><%= user.email %></td>
+                <td><%= user.role || "N/A" %></td>
+                <td><%= user.phone || "N/A" %></td>
+                <td>
+                  <a href="/admin/users/edit/<%= user._id %>"
+                     class="btn btn-sm btn-warning">Edit</a>
+
+                  <a href="/admin/users/delete/<%= user._id %>"
+                     class="btn btn-sm btn-danger"
+                     onclick="return confirm('Delete this user?')">
+                     Delete
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="5" class="text-center">No users found</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- PAGINATION BELOW TABLE -->
+    <% if (pagination && pagination.totalPages > 1) { %>
+      <div class="card-footer clearfix">
+        <ul class="pagination pagination-sm float-right mb-0">
+
+          <% if (pagination.hasPrevPage) { %>
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page=<%= pagination.prevPage %>">
+                 Previous
+              </a>
+            </li>
+          <% } %>
+
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+            <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>">
+                <%= i %>
+              </a>
+            </li>
+          <% } %>
+
+          <% if (pagination.hasNextPage) { %>
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page=<%= pagination.nextPage %>">
+                 Next
+              </a>
+            </li>
+          <% } %>
+
+        </ul>
+      </div>
+    <% } %>
+
+  </div>
+</div>
+
+        </div> <!-- content -->
+
+        <%- include('../../partials/adminFooter') %>
+
+    </div> <!-- content-wrapper -->
+
+</div> <!-- wrapper -->
+
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    });
+</script>

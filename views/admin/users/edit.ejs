@@ -1,0 +1,91 @@
+<%- include('../../partials/adminHeader', { title: "Edit User" }) %>
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <!-- Page Content -->
+            <div class="container mt-4">
+                <h3>Edit User</h3>
+
+                <form action="/admin/users/update/<%= user._id %>" method="POST">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>First Name</label>
+                            <input class="form-control" name="firstName" value="<%= user.firstName %>" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Last Name</label>
+                            <input class="form-control" name="lastName" value="<%= user.lastName %>" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input class="form-control" name="email" value="<%= user.email || '' %>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        <input class="form-control" name="phone" value="<%= user.phone || '' %>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Role</label>
+                        <select name="role" id="role" class="form-control" onchange="toggleTeacherFields()">
+                            <option value="student" <%= user.role === 'student' ? 'selected' : '' %>>Student</option>
+                            <option value="teacher" <%= user.role === 'teacher' ? 'selected' : '' %>>Teacher</option>
+                            <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                        </select>
+                    </div>
+
+                    <!-- Teacher Only Fields -->
+                    <div id="teacherFields" style="display:<%= user.role === 'teacher' ? 'block' : 'none' %>">
+
+                        <div class="mb-3">
+                            <label>Subject Taught</label>
+                            <input class="form-control" name="subjectTaught" value="<%= user.subjectTaught || '' %>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Institution</label>
+                            <input class="form-control" name="institution" value="<%= user.institution || '' %>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Years of Experience</label>
+                            <input type="number" class="form-control" name="yearsOfExperience" value="<%= user.yearsOfExperience || '' %>">
+                        </div>
+
+                    </div>
+
+                    <button class="btn btn-primary">Update</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../partials/adminFooter') %>
+
+    </div>
+</div>
+
+<script>
+function toggleTeacherFields(){
+    const role = document.getElementById("role").value;
+    document.getElementById("teacherFields").style.display =
+        role === "teacher" ? "block" : "none";
+}
+</script>

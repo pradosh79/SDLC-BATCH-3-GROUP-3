@@ -1,0 +1,25 @@
+<%- include('./layouts/userHeader', { title: 'mini upwork' }) %>
+
+<div id="wrapper">
+
+    <%- include('./layouts/userSidebar') %>
+
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <div id="content">
+
+            <!-- FIXED: pass user properly -->
+            <%- include('./layouts/userNavbar', {user:user}) %>
+
+            <div class="container-fluid">
+                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+
+                <!-- your dashboard cards here -->
+            </div>
+
+        </div>
+
+        <%- include('./layouts/userFooter') %>
+    </div>
+
+</div>

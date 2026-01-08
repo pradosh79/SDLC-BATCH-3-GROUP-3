@@ -1,0 +1,82 @@
+<%- include('../../partials/adminHeader', { title: "Lessons" }) %>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <!-- Page Content -->
+            <div class="container mt-4">
+                <h3>Lessons</h3>
+
+                <form method="POST" action="/admin/lessons/create" enctype="multipart/form-data" class="mb-4">
+
+                    <input type="hidden" name="courseId" value="<%= courseId %>">
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input class="form-control" name="title" placeholder="Lesson Title" required>
+                        </div>
+
+                        <div class="col-md-5">
+                            <input type="file" class="form-control" name="thumbnail" required>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100">Add Lesson</button>
+                        </div>
+                    </div>
+
+                </form>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Preview</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% lessons.forEach(l => { %>
+                        <tr>
+                            <td><%= l.title %></td>
+
+                            <td>
+                                <video width="160" height="90" controls>
+                                    <source src="<%= l.videoUrl %>" type="video/mp4">
+                                </video>
+                            </td>
+
+                            <td>
+                                <a class="btn btn-sm btn-info" href="/admin/quiz/<%= l._id %>">Quiz</a>
+                                <a class="btn btn-sm btn-danger" 
+                                   href="/admin/lessons/delete/<%= l._id %>" 
+                                   onclick="return confirm('Delete lesson?')">
+                                   Delete
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../partials/adminFooter') %>
+
+    </div>
+</div>

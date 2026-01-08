@@ -1,0 +1,216 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../model/userModel");
+
+class AdminController {
+
+  async dashboard(req, res) {
+    try {
+      res.render("admin/dashboard", {
+        admin: req.user
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async login(req, res) {
+    try {
+      res.render("admin/adminLogin", {});
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async loginCreate(req, res) {
+    try {
+      const { email, password } = req.body;
+
+      if (!(email && password)) {
+        return res.redirect("/admin");
+      }
+
+      const user = await User.findOne({ email });
+
+      if (
+        user &&
+        user.role === "admin" &&
+        (await bcrypt.compare(password, user.password))
+      ) {
+
+        const tokendata = jwt.sign(
+          {
+            user_id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+          },
+          process.env.JWT_SECRET_ADMIN,
+          { expiresIn: "8h" }
+        );
+
+        res.cookie("adminToken", tokendata);
+        return res.redirect("/admin/dashboard");
+      }
+
+      return res.redirect("/admin");
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async adminLogout(req, res) {
+    try {
+      res.clearCookie('adminToken');
+      req.session.destroy(() => {
+        return res.redirect('/admin');
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // ================= USERS LIST =================
+  async users(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+
+      const aggregate = User.aggregate([
+        { $sort: { createdAt: -1 } }
+      ]);
+
+      const result = await User.aggregatePaginate(aggregate, { page, limit });
+
+      return res.render("admin/users/index", {
+        title: "Users List",
+        admin: req.user,
+        users: result.docs,
+        pagination: result
+      });
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Server Error");
+    }
+  }
+
+  // ================= CREATE FORM =================
+  async userCreateForm(req, res) {
+    try {
+      res.render("admin/users/create", {
+        title: "Add User",
+        admin: req.user
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // ================= CREATE USER =================
+  async userCreate(req, res) {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        role,
+        subjectTaught,
+        institution,
+        yearsOfExperience
+      } = req.body;
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await User.create({
+        firstName,
+        lastName,
+        email,
+        phone,
+        role,
+        password: hashedPassword,
+
+        isStudent: role === "student",
+        isTeacher: role === "teacher",
+
+        subjectTaught: role === "teacher" ? subjectTaught : undefined,
+        institution: role === "teacher" ? institution : undefined,
+        yearsOfExperience: role === "teacher" ? yearsOfExperience : undefined
+      });
+
+      return res.redirect("/admin/users");
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Create user failed");
+    }
+  }
+
+  // ================= EDIT FORM =================
+  async userEditForm(req, res) {
+    try {
+      const user = await User.findById(req.params.id);
+
+      res.render("admin/users/edit", {
+        title: "Edit User",
+        admin: req.user,
+        user
+      });
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Edit page load failed");
+    }
+  }
+
+  // ================= UPDATE USER =================
+  async userUpdate(req, res) {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        phone,
+        role,
+        subjectTaught,
+        institution,
+        yearsOfExperience
+      } = req.body;
+
+      await User.findByIdAndUpdate(req.params.id, {
+        firstName,
+        lastName,
+        email,
+        phone,
+        role,
+        isStudent: role === "student",
+        isTeacher: role === "teacher",
+        subjectTaught: role === "teacher" ? subjectTaught : undefined,
+        institution: role === "teacher" ? institution : undefined,
+        yearsOfExperience: role === "teacher" ? yearsOfExperience : undefined
+      });
+
+      res.redirect("/admin/users");
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Update failed");
+    }
+  }
+
+  // ================= DELETE USER =================
+  async userDelete(req, res) {
+    try {
+      await User.findByIdAndDelete(req.params.id);
+      res.redirect("/admin/users");
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Delete error");
+    }
+  }
+}
+
+module.exports = new AdminController();
