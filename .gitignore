@@ -1,0 +1,53 @@
+# =====================
+# NODE
+# =====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =====================
+# ENV FILES
+# =====================
+.env
+.env.*
+!.env.example
+
+# =====================
+# UPLOADS
+# =====================
+uploads/
+storage/
+
+# =====================
+# BUILD
+# =====================
+dist/
+build/
+
+# =====================
+# LOGS
+# =====================
+logs/
+*.log
+
+# =====================
+# LARAVEL
+# =====================
+/vendor/
+/public/storage
+/storage/*.key
+/bootstrap/cache/
+
+# =====================
+# OS FILES
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# IDE
+# =====================
+.vscode/
+.idea/
+*.swp

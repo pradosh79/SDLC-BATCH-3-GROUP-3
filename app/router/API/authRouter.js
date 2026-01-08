@@ -16,7 +16,14 @@ const router = express.Router();
 //auth
 router.post('/register',authController.Register)
 router.post('/login',authController.Login)
-router.get('/dashboard',AuthCheck,authController.Dashboard)
+router.post('/verify-email', authController.VerifyEmail)
+router.post('/reset-password-link', authController.resetPasswordLink);
+router.post('/reset-password/:id/:token', authController.resetPassword);
+
+//auth protected route
+router.post('/update-password', AuthCheck, authController.updatePassword)
+router.get('/dashboard', AuthCheck, authController.Dashboard)
+
 //course
 router.get("/courses", course.getAllCourses);
 router.get("/courses/search", course.searchCourses);
