@@ -139,6 +139,10 @@ class AuthController {
 
             const resetLink = `${process.env.FRONTEND_HOST}/api/reset-password/${user._id}/${token}`;
 
+            await transporter.verify((err, success) => {
+                if (err) console.log(err);
+                else console.log("Email server ready");
+            });
             await transporter.sendMail({
                 from: process.env.EMAIL_FROM,
                 to: user.email,
