@@ -122,7 +122,7 @@ class AuthController {
     // ================= RESET PASSWORD LINK =================
     async resetPasswordLink(req, res) {
         try {
-            console.log(req.body);
+            
             const { email } = req.body;
 
             if (!email) {
