@@ -2,6 +2,7 @@ const User = require('../../model/userModel');
 const { hashedPassword, comparePassword } = require('../../helper/hashedPassword');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const transporter = require('../../config/emailConfig');
 
 class AuthController {
 
@@ -121,7 +122,7 @@ class AuthController {
     // ================= RESET PASSWORD LINK =================
     async resetPasswordLink(req, res) {
         try {
-
+            console.log(req.body);
             const { email } = req.body;
 
             if (!email) {

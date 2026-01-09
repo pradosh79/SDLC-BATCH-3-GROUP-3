@@ -13,7 +13,11 @@ dbCon()
 
 //cose
 app.use(cors())
-//setup ejs as the template engine
+
+
+//middleware use
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
 app.use(session({
     secret:"webskitters"||process.env.SECRET,
@@ -29,9 +33,7 @@ app.use(cookieParser())
 app.set("view engine", "ejs");
 app.set('views','views')
 
-//middleware use
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+
 //create static folder
 app.use(express.static('public'));
 app.use('/uploads',express.static(path.join(__dirname,'/uploads')));
