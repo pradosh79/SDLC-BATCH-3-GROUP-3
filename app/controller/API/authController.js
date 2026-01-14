@@ -33,7 +33,7 @@ class AuthController {
                 }
             }
 
-            const hashpassword = await hashedPassword(password);
+            const haspassword = await hashedPassword(password);
 
             const userdata = new User({
                 role: role || "student",
@@ -41,7 +41,7 @@ class AuthController {
                 lastName,
                 email,
                 phone,
-                password: hashpassword,
+                password: haspassword,
 
                 isStudent: role === "student",
                 isTeacher: role === "teacher",

@@ -27,7 +27,10 @@ router.get('/dashboard', AuthCheck, authController.Dashboard)
 //course
 router.get("/courses", course.getAllCourses);
 router.get("/courses/search", course.searchCourses);
+router.get("/courses/category/:name", course.getByCategory);
 router.get("/courses/:id", course.getCourseDetails);
+
+
 //lesson
 router.get("/lessons/course/:courseId", lesson.getLessonsByCourse);
 //quiz
