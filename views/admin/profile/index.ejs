@@ -1,0 +1,49 @@
+<%- include('../../partials/adminHeader', { title: "Admin Profile" }) %>
+
+<div id="wrapper">
+
+  <%- include('../../partials/adminSidebar') %>
+
+  <div id="content-wrapper">
+    <div id="content">
+
+      <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+      <div class="container mt-4">
+        <h3>My Profile</h3>
+
+        <form method="POST" action="/admin/profile/update" class="card p-4">
+
+          <div class="mb-3">
+    <label>First Name</label>
+    <input class="form-control" name="firstName"
+           value="<%= admin.firstName %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Last Name</label>
+    <input class="form-control" name="lastName"
+           value="<%= admin.lastName %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Email</label>
+    <input class="form-control" name="email"
+           value="<%= admin.email %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Phone</label>
+    <input class="form-control" name="phone"
+           value="<%= admin.phone %>">
+  </div>
+
+  <button class="btn btn-primary">Update Profile</button>
+
+        </form>
+      </div>
+
+    </div>
+    <%- include('../../partials/adminFooter') %>
+  </div>
+</div>

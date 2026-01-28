@@ -15,39 +15,40 @@
   <a href="/admin/courses/create" class="btn btn-primary btn-sm">Add Course</a>
 </div>
 
-<table class="table table-bordered">
-<thead>
-<tr>
-  <th>Thumbnail</th>
-  <th>Title</th>
-  <th>Teacher</th>
-  <th>Price</th>
-  <th>Action</th>
-</tr>
-</thead>
+  <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Teacher</th>
+              <th>Price</th>
+              <th>Level</th>
+              <th>Published</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
 
-<tbody>
-<% courses.forEach(c => { %>
-<tr>
-  <td>
-    <img src="<%= c.thumbnail %>" width="80">
-    <video width="160" height="90" controls>
-  <source src="<%= c.thumbnail %>" type="video/mp4">
-</video>
-   </td>
-  <td><%= c.title %></td>
-  <td><%= c.teacher?.firstName %></td>
-  <td>₹<%= c.price || 0 %></td>
-  <td>
-    <a class="btn btn-sm btn-info" href="/admin/lessons/<%= c._id %>">Lessons</a>
-    <a class="btn btn-sm btn-warning" href="/admin/courses/edit/<%= c._id %>">Edit</a>
-    <a class="btn btn-sm btn-danger" href="/admin/courses/delete/<%= c._id %>"
-       onclick="return confirm('Delete course?')">Delete</a>
-  </td>
-</tr>
-<% }) %>
-</tbody>
-</table>
+          <tbody>
+            <% courses.forEach(c => { %>
+              <tr>
+                <td><%= c.title %></td>
+                <td><%= c.teacher?.firstName %></td>
+                <td>
+                  <%= c.isFree ? "Free" : "₹" + c.price %>
+                </td>
+                <td><%= c.level %></td>
+                <td>
+                  <%= c.isPublished ? "Yes" : "No" %>
+                </td>
+                <td>
+                  <a href="/admin/courses/edit/<%= c._id %>" class="btn btn-sm btn-warning">Edit</a>
+                  <a href="/admin/courses/delete/<%= c._id %>" class="btn btn-sm btn-danger"
+                     onclick="return confirm('Delete course?')">Delete</a>
+                  <a href="/admin/courses/<%= c._id %>/lessons" class="btn btn-sm btn-info"> Lessons</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
 
 </div>
 </div>

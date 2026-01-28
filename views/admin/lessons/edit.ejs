@@ -1,0 +1,30 @@
+<%- include('../../partials/adminHeader', { title: "Add Course" }) %>
+
+<div id="wrapper">
+<%- include('../../partials/adminSidebar') %>
+
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+
+<%- include('../../partials/adminNavbar', { user: admin }) %>
+
+<div class="container mt-4">
+<h3>Add Lesson</h3>
+
+    <form method="POST" action="/admin/lessons/update/<%= lesson._id %>" enctype="multipart/form-data">
+
+<input type="hidden" name="courseId" value="<%= lesson.course %>">
+
+<input class="form-control mb-2" name="title" value="<%= lesson.title %>">
+<input class="form-control mb-2" name="duration" value="<%= lesson.duration %>">
+<input class="form-control mb-2" name="order" value="<%= lesson.order %>">
+<input type="file" name="video" class="form-control mb-2">
+
+<button class="btn btn-primary">Update Lesson</button>
+</form>
+</div>
+</div>
+
+<%- include('../../partials/adminFooter') %>
+</div>
+</div>

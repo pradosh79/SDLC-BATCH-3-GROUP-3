@@ -8,6 +8,7 @@ const enroll = require("../../controller/API/enrollApiController");
 const rating = require("../../controller/API/ratingApiController");
 const teacher = require("../../controller/API/teacherDashboardController");
 const student = require("../../controller/API/studentDashboardController");
+const wishlist = require("../../controller/API/wishlistApiController");
 
 const AuthCheck = require('../../middleware/authCheck');
 
@@ -37,17 +38,22 @@ router.get("/lessons/course/:courseId", lesson.getLessonsByCourse);
 router.get("/quiz/lesson/:lessonId", quiz.getQuizByLesson);
 router.post("/quiz/submit", quiz.submitQuiz);
 //progress
-router.get("/progress", AuthCheck, progress.getUserProgress);
-router.post("/progress/update", AuthCheck, progress.updateProgress);
+router.post("/lesson-complete", AuthCheck, progress.markCompleted);
+router.post("/quiz-score", AuthCheck, progress.saveQuizScore);
+router.get("/course/:courseId", AuthCheck, progress.courseProgress);
 //enroll
 router.post("/enroll", AuthCheck, enroll.enrollCourse);
 router.get("/enroll", AuthCheck, enroll.myCourses);
 //rating
-router.post("/rating", AuthCheck, rating.rateCourse);
+router.post("/rating", AuthCheck, rating.submit);
 //teacher
 router.get("/teacher/dashboard", AuthCheck, teacher.dashboard);
 //student
 router.get("/student/dashboard", AuthCheck, student.dashboard);
+
+//wishlist
+router.post("/toggle", AuthCheck, wishlist.toggle);
+router.get("/list", AuthCheck, wishlist.list);
 
 module.exports = router;
 

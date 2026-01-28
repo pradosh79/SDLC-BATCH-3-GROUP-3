@@ -1,17 +1,36 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../model/userModel");
+const Course = require("../model/courseModel");
+const Progress = require("../model/progressModel");
+const Enrollment = require("../model/enrollmentModel");
 
 class AdminController {
 
   async dashboard(req, res) {
     try {
-      res.render("admin/dashboard", {
-        admin: req.user
-      });
-    } catch (error) {
-      console.log(error);
-    }
+
+    // 🔢 Analytics counts
+    const totalStudents = await User.countDocuments({ role: "student" });
+    const totalTeachers = await User.countDocuments({ role: "teacher" });
+    const totalCourses  = await Course.countDocuments();
+    const totalEnrollments = await Enrollment.countDocuments();
+    const completedLessons = await Progress.countDocuments({ completed: true });
+
+    res.render("admin/dashboard", {
+      admin: req.user,
+      stats: {
+        totalStudents,
+        totalTeachers,
+        totalCourses,
+        totalEnrollments,
+        completedLessons
+      }
+    });
+
+  } catch (error) {
+    console.log("Dashboard error:", error);
+  }
   }
 
   async login(req, res) {
@@ -60,12 +79,54 @@ class AdminController {
     }
   }
 
+  /* =====================
+     ADMIN PROFILE
+  ===================== */
+  async profile(req, res) {
+    try {
+      const admin = await User.findById(req.user._id);
+
+      res.render("admin/profile/index", {
+        admin
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /* =====================
+     UPDATE PROFILE
+  ===================== */
+  async updateProfile(req, res) {
+  try {
+    console.log("PROFILE UPDATE BODY:", req.body);
+
+    const { firstName, lastName, email, phone } = req.body;
+
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { firstName, lastName, email, phone },
+      { runValidators: true }
+    );
+
+    res.redirect("/admin/profile");
+
+  } catch (error) {
+    console.log("Profile update error:", error);
+  }
+}
+
+  /* =====================
+     LOGOUT
+  ===================== */
   async adminLogout(req, res) {
     try {
-      res.clearCookie('adminToken');
-      req.session.destroy(() => {
-        return res.redirect('/admin');
+      res.clearCookie("adminToken");
+
+      req.session?.destroy(() => {
+        return res.redirect("/admin");
       });
+
     } catch (error) {
       console.log(error);
     }

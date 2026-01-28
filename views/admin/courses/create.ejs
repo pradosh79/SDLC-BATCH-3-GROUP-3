@@ -11,7 +11,7 @@
 <div class="container mt-4">
 <h3>Add Course</h3>
 
-<form action="/admin/courses/create" method="POST" enctype="multipart/form-data">
+<!-- <form action="/admin/courses/create" method="POST" enctype="multipart/form-data">
 
 <div class="mb-3">
 <label>Title</label>
@@ -59,8 +59,44 @@
 </div>
 
 <button class="btn btn-primary">Save</button>
-</form>
+</form> -->
 
+
+<form action="/admin/courses/create" method="POST" enctype="multipart/form-data">
+
+          <input class="form-control mb-2" name="title" placeholder="Course Title" required>
+
+          <textarea class="form-control mb-2" name="shortDescription" placeholder="Short Description" required></textarea>
+
+          <textarea class="form-control mb-2" name="longDescription" placeholder="Long Description"></textarea>
+
+          <select name="teacher" class="form-control mb-2" required>
+            <% teachers.forEach(t => { %>
+              <option value="<%= t._id %>"><%= t.firstName %></option>
+            <% }) %>
+          </select>
+
+          <input type="file" name="thumbnail" class="form-control mb-2" required>
+
+          <input class="form-control mb-2" name="category" placeholder="Category">
+
+          <select name="level" class="form-control mb-2">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+
+          <input class="form-control mb-2" name="tags" placeholder="Tags (react,node,js)">
+
+          <input class="form-control mb-2" name="price" placeholder="Price (0 = Free)">
+
+          <div class="form-check mb-3">
+            <input type="checkbox" name="isPublished" class="form-check-input">
+            <label class="form-check-label">Publish Course</label>
+          </div>
+
+          <button class="btn btn-primary">Save Course</button>
+        </form>
 </div>
 </div>
 

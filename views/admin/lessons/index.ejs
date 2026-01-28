@@ -1,82 +1,42 @@
 <%- include('../../partials/adminHeader', { title: "Lessons" }) %>
 
 <div id="wrapper">
+<%- include('../../partials/adminSidebar') %>
 
-    <!-- Sidebar -->
-    <%- include('../../partials/adminSidebar') %>
+<div id="content-wrapper">
+<div id="content">
+<%- include('../../partials/adminNavbar', { user: admin }) %>
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+<div class="container mt-4">
+<h3>Lessons – <%= course.title %></h3>
 
-        <!-- Main Content -->
-        <div id="content">
+<a href="/admin/courses/<%= course._id %>/lessons/create"
+   class="btn btn-primary mb-3">Add Lesson</a>
 
-            <!-- Navbar -->
-            <%- include('../../partials/adminNavbar', { user: admin }) %>
+<table class="table">
+<tr>
+<th>Title</th>
+<th>Order</th>
+<th>Actions</th>
+</tr>
 
-            <!-- Page Content -->
-            <div class="container mt-4">
-                <h3>Lessons</h3>
+<% lessons.forEach(l => { %>
+<tr>
+<td><%= l.title %></td>
+<td><%= l.order %></td>
+<td>
+<a href="/admin/lessons/edit/<%= l._id %>" class="btn btn-warning btn-sm">Edit</a>
+<a href="/admin/quiz/<%= l._id %>" class="btn btn-info btn-sm">Quiz</a>
+<a href="/admin/lessons/delete/<%= l._id %>"
+   onclick="return confirm('Delete lesson?')"
+   class="btn btn-danger btn-sm">Delete</a>
+</td>
+</tr>
+<% }) %>
 
-                <form method="POST" action="/admin/lessons/create" enctype="multipart/form-data" class="mb-4">
-
-                    <input type="hidden" name="courseId" value="<%= courseId %>">
-
-                    <div class="row">
-                        <div class="col-md-5">
-                            <input class="form-control" name="title" placeholder="Lesson Title" required>
-                        </div>
-
-                        <div class="col-md-5">
-                            <input type="file" class="form-control" name="thumbnail" required>
-                        </div>
-
-                        <div class="col-md-2">
-                            <button class="btn btn-primary w-100">Add Lesson</button>
-                        </div>
-                    </div>
-
-                </form>
-
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Preview</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <% lessons.forEach(l => { %>
-                        <tr>
-                            <td><%= l.title %></td>
-
-                            <td>
-                                <video width="160" height="90" controls>
-                                    <source src="<%= l.videoUrl %>" type="video/mp4">
-                                </video>
-                            </td>
-
-                            <td>
-                                <a class="btn btn-sm btn-info" href="/admin/quiz/<%= l._id %>">Quiz</a>
-                                <a class="btn btn-sm btn-danger" 
-                                   href="/admin/lessons/delete/<%= l._id %>" 
-                                   onclick="return confirm('Delete lesson?')">
-                                   Delete
-                                </a>
-                            </td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-
-            </div>
-
-        </div>
-
-        <!-- Footer -->
-        <%- include('../../partials/adminFooter') %>
-
-    </div>
+</table>
+</div>
+</div>
+<%- include('../../partials/adminFooter') %>
+</div>
 </div>

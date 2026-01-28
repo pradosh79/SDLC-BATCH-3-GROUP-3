@@ -105,43 +105,67 @@ class AdminCourseController {
   }
 
   /* ============================
-     UPDATE COURSE
-  ============================ */
-  async update(req, res) {
-    try {
+   UPDATE COURSE
+============================ */
+async update(req, res) {
+  try {
+    console.log("UPDATE BODY:", req.body);
 
-      const updateData = {
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        longDescription: req.body.longDescription,
-        teacher: req.body.teacher,
-        category: req.body.category,
-        level: req.body.level,
-        tags: req.body.tags ? req.body.tags.split(",") : [],
-        price: req.body.price || 0,
-        isFree: req.body.price == 0,
-        isPublished: req.body.isPublished === "on"
-      };
+    const updateData = {
+      title: req.body.title?.trim(),
+      shortDescription: req.body.shortDescription?.trim(),
+      longDescription: req.body.longDescription?.trim(),
 
-      // Update thumbnail only if uploaded
-      if (req.file) {
-        updateData.thumbnail = req.file.path;
-      }
+      teacher: req.body.teacher,
+      category: req.body.category || "General",
+      level: req.body.level || "Beginner",
 
-      // Set publish date
-      if (req.body.isPublished === "on") {
-        updateData.publishedAt = new Date();
-      }
+      // tags: "react,node,js" → ["react","node","js"]
+      tags: req.body.tags
+        ? req.body.tags.split(",").map(t => t.trim()).filter(Boolean)
+        : [],
 
-      await Course.findByIdAndUpdate(req.params.id, updateData);
+      price: req.body.price ? Number(req.body.price) : 0,
+      isFree: !req.body.price || Number(req.body.price) === 0,
 
-      res.redirect("/admin/courses");
+      isPublished: req.body.isPublished === "on",
+    };
 
-    } catch (error) {
-      console.log("Course update error:", error);
-      res.status(500).send("Update failed");
+    // ✅ Update thumbnail ONLY if new file uploaded
+    if (req.file && req.file.path) {
+      updateData.thumbnail = req.file.path;
     }
+
+    // ✅ Handle publishedAt correctly
+    if (req.body.isPublished === "on") {
+      updateData.publishedAt = new Date();
+    } else {
+      updateData.publishedAt = null;
+    }
+
+    await Course.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    res.redirect("/admin/courses");
+
+  } catch (error) {
+
+    if (error.name === "ValidationError") {
+        return res.status(400).send(
+          "Short description must be under 300 characters"
+        );
+    }
+    console.error("Course update error:", error);
+    res.status(500).send("Update failed");
   }
+}
+
 
   /* ============================
      DELETE COURSE

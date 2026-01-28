@@ -1,18 +1,88 @@
-<%- include('../../partials/adminHeader', { title: "Progress" }) %>
+<%- include('../../partials/adminHeader', { title: "Quiz" }) %>
 
-<div class="container mt-4">
-<h3>Student Progress</h3>
+<div id="wrapper">
 
-<table class="table">
-<tr><th>User</th><th>Lesson</th><th>Score</th></tr>
+    <!-- Sidebar -->
+    <%- include('../../partials/adminSidebar') %>
 
-<% progress.forEach(p=>{ %>
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Navbar -->
+            <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+            <!-- Page Content -->
+            <div class="container mt-4">
+                <h3>Student Progress</h3>
+
+<form method="GET" class="row g-3 mb-4">
+
+  <div class="col-md-4">
+    <select name="courseId" class="form-control">
+      <option value="">All Courses</option>
+      <% courses.forEach(c => { %>
+        <option value="<%= c._id %>"
+          <%= selectedCourse == c._id ? "selected" : "" %>>
+          <%= c.title %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <select name="studentId" class="form-control">
+      <option value="">All Students</option>
+      <% students.forEach(s => { %>
+        <option value="<%= s._id %>"
+          <%= selectedStudent == s._id ? "selected" : "" %>>
+          <%= s.firstName %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <button class="btn btn-primary">Filter</button>
+    <a href="/admin/progress" class="btn btn-secondary">Reset</a>
+  </div>
+
+</form>
+
+<table class="table table-bordered">
+<thead>
 <tr>
-<td><%= p.user.firstName %></td>
-<td><%= p.lesson.title %></td>
-<td><%= p.score %></td>
+  <th>Student</th>
+  <th>Course</th>
+  <th>Lesson</th>
+  <th>Completed</th>
+  <th>Quiz Score</th>
+</tr>
+</thead>
+
+<tbody>
+<% progress.forEach(p => { %>
+<tr>
+  <td><%= p.user.firstName %></td>
+  <td><%= p.course.title %></td>
+  <td><%= p.lesson.title %></td>
+  <td><%= p.completed ? "Yes" : "No" %></td>
+  <td><%= p.quizScore %></td>
 </tr>
 <% }) %>
-
+</tbody>
 </table>
+
+                
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <%- include('../../partials/adminFooter') %>
+
+    </div>
 </div>
