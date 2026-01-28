@@ -1,0 +1,43 @@
+<%- include('../../partials/adminHeader', { title: "Add Course" }) %>
+
+<div id="wrapper">
+<%- include('../../partials/adminSidebar') %>
+
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+
+<%- include('../../partials/adminNavbar', { user: admin }) %>
+
+<div class="container mt-4">
+     <h2>Testimonials</h2>
+
+<form action="/admin/about/testimonials/add" method="POST">
+  <input class="form-control mb-2" name="name" placeholder="Name" required>
+  <input class="form-control mb-2" name="role" placeholder="Role">
+  <input class="form-control mb-2" name="image" placeholder="Image URL">
+  <textarea class="form-control mb-2" name="review" placeholder="Review"></textarea>
+  <input class="form-control mb-2" name="rating" type="number" min="1" max="5">
+  <button class="btn btn-primary" type="submit">Add Testimonial</button>
+</form>
+
+<hr/>
+
+<% if (about && about.testimonials.length) { %>
+  <% about.testimonials.forEach(t => { %>
+    <div style="border:1px solid #ccc; padding:10px">
+      <img src="<%= t.image %>" width="80"><br/>
+      <strong><%= t.name %></strong> - <%= t.role %><br/>
+      ⭐ <%= t.rating %>/5<br/>
+      <p><%= t.review %></p>
+      <a href="/admin/about/testimonials/delete/<%= t._id %>">Delete</a>
+    </div>
+  <% }) %>
+<% } else { %>
+  <p>No testimonials added</p>
+<% } %>
+</div>
+</div>
+
+<%- include('../../partials/adminFooter') %>
+</div>
+</div>

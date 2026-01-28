@@ -9,6 +9,9 @@ const rating = require("../../controller/API/ratingApiController");
 const teacher = require("../../controller/API/teacherDashboardController");
 const student = require("../../controller/API/studentDashboardController");
 const wishlist = require("../../controller/API/wishlistApiController");
+const about = require("../../controller/API/aboutApiController");
+const contact = require("../../controller/API/contactApiController");
+const ContactInfo=require("../../controller/API/contactInfoApiController");
 
 const AuthCheck = require('../../middleware/authCheck');
 
@@ -54,6 +57,14 @@ router.get("/student/dashboard", AuthCheck, student.dashboard);
 //wishlist
 router.post("/toggle", AuthCheck, wishlist.toggle);
 router.get("/list", AuthCheck, wishlist.list);
+
+//about
+router.get("/about", about.list);
+
+//contact
+router.get("/contact", contact.createContact);
+//ContactInfo
+router.get("/contactInfo", ContactInfo.getContactInfo);
 
 module.exports = router;
 

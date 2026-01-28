@@ -1,16 +1,14 @@
 const express= require('express');
 
 const upload = require("../middleware/videoUpload");
-
 const course = require("../controller/adminCourseController");
-
 const lesson = require("../controller/adminLessonController");
 const quiz = require("../controller/adminQuizController");
 const progress = require("../controller/adminProgressController");
-
-
-
 const admin = require("../controller/AdminController");
+
+const about= require("../controller/aboutController");
+const adminContact = require("../controller/adminContactController");
 
 const AuthCheckAdmin = require('../middleware/adminAuthCheck');
 
@@ -86,6 +84,42 @@ router.get("/quiz/delete/:id", quiz.delete);
 
 /* progress */
 router.get("/progress", progress.index);
+
+//about
+
+// Create about content
+router.get("/about/create", AuthCheckAdmin, about.createPage);
+
+// Read all / single
+router.get("/about",AuthCheckAdmin, about.list);
+router.get("/about/edit/:id", AuthCheckAdmin, about.editPage);
+router.post("/about/store", AuthCheckAdmin, about.store); 
+
+// Update by ID
+router.put("/about/update/:id", AuthCheckAdmin, about.update);
+
+// Delete by ID
+router.post("/about/delete/:id",  about.delete);
+
+
+// Trusted By
+router.get("/about/trustedby", about.trustedByPage);
+router.post("/about/trustedby/add", about.addTrustedBy);
+router.post("/about/trustedby/delete/:index", about.deleteTrustedBy);
+
+// Testimonials
+router.get("/about/testimonials", about.testimonialsPage);
+router.post("/about/testimonials/add", about.addTestimonial);
+router.get("/about/testimonials/delete/:id", about.deleteTestimonial);
+
+//adminContact
+// Contact messages
+router.get("/contacts", adminContact.contactList);
+router.post("/contacts/delete/:id", adminContact.deleteContact);
+
+// Contact info
+router.get("/contact-info", adminContact.contactInfoPage);
+router.post("/contact-info", adminContact.updateContactInfo);
 
 
 

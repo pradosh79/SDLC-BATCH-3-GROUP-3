@@ -48,7 +48,7 @@ class AdminCourseController {
 
       // Thumbnail uploaded via CloudinaryStorage
       const thumbnailUrl = req.file ? req.file.path : null;
-
+      console.log(thumbnailUrl);
       if (!thumbnailUrl) {
         return res.redirect("/admin/courses/create");
       }
@@ -59,14 +59,11 @@ class AdminCourseController {
         longDescription: req.body.longDescription || "",
         teacher: req.body.teacher,
         thumbnail: thumbnailUrl,
-
         category: req.body.category || "General",
         level: req.body.level || "Beginner",
         tags: req.body.tags ? req.body.tags.split(",") : [],
-
         price: req.body.price || 0,
         isFree: req.body.price == 0,
-
         isPublished: req.body.isPublished === "on",
         publishedAt: req.body.isPublished === "on" ? new Date() : null
       });

@@ -1,0 +1,26 @@
+<%- include('../../partials/adminHeader', { title: "Edit Course" }) %>
+
+<div id="wrapper">
+  <%- include('../../partials/adminSidebar') %>
+
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+
+      <%- include('../../partials/adminNavbar', { user: admin }) %>
+
+      <div class="container mt-4">
+        <h3>Edit About</h3>
+          <form action="/admin/about/update/<%= about._id %>" method="POST">
+    
+            <input class="form-control mb-2" type="text" name="welcomeTitle" value="<%= about.welcomeTitle %>" required />
+            <textarea class="form-control mb-2" name="welcomeDescription" required><%= about.welcomeDescription %></textarea>
+            <input class="form-control mb-2" type="text" name="visionTitle" value="<%= about.visionTitle %>" />
+            <textarea class="form-control mb-2" name="visionDescription"><%= about.visionDescription %></textarea>
+            <button class="btn btn-primary" type="submit">Save</button>
+          </form>       
+      </div>
+
+    </div>
+    <%- include('../../partials/adminFooter') %>
+  </div>
+</div>

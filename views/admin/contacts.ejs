@@ -1,0 +1,47 @@
+<%- include('../partials/adminHeader', { title: "Contact" }) %>
+
+<div id="wrapper">
+<%- include('../partials/adminSidebar') %>
+
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+
+<%- include('../partials/adminNavbar', { user: admin }) %>
+
+<div class="container mt-4">
+
+<h2>Contact Messages</h2>
+
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Message</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% contacts.forEach(c => { %>
+        <tr>
+          <td><%= c.firstName %> <%= c.lastName %></td>
+          <td><%= c.email %></td>
+          <td><%= c.message %></td>
+          <td><%= c.createdAt.toDateString() %></td>
+          <td>
+            <form method="POST" action="/admin/contacts/delete/<%= c._id %>">
+              <button class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+</div>
+</div>
+
+<%- include('../partials/adminFooter') %>
+</div>
+</div>
