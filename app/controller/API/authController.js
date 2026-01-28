@@ -311,7 +311,7 @@ class AuthController {
 
         } catch (error) {
             console.error(error);
-            res.status(500).json({ status: false, message: "Unable to verify email, please try again later" });
+            res.status(500).json({ status: false, message: error.message });
         }
 
 
