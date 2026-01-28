@@ -3,6 +3,7 @@ const { hashedPassword, comparePassword } = require('../../helper/hashedPassword
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const transporter = require('../../config/emailConfig');
+const EmailVerifyModel= require('../../model/otpModel');
 
 class AuthController {
 
