@@ -9,45 +9,58 @@ class CourseApiController {
      GET ALL COURSES (HOME PAGE / COURSE LIST)
   ===================================================== */
   async getAllCourses(req, res) {
-    try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = 6;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
 
-      const options = {
-        page,
-        limit,
-        sort: { createdAt: -1 },
-        populate: {
-          path: "teacher",
-          select: "firstName lastName"
-        },
-        select: `
-          title
-          shortDescription
-          thumbnail
-          price
-          isFree
-          level
-          category
-          avgRating
-          totalRatings
-          totalLessons
-          totalDuration
-        `
-      };
+    const aggregate = Course.aggregate([
+      { $match: { isPublished: true } },
 
-      const result = await Course.aggregatePaginate(
-        Course.aggregate([{ $match: { isPublished: true } }]),
-        options
-      );
+      {
+        $lookup: {
+          from: "users",              // MongoDB collection name
+          localField: "teacher",
+          foreignField: "_id",
+          as: "teacher"
+        }
+      },
 
-      res.json(result);
+      { $unwind: "$teacher" },
 
-    } catch (error) {
-      console.log("getAllCourses error:", error);
-      res.status(500).json({ message: "Server error" });
-    }
+      {
+        $project: {
+          title: 1,
+          shortDescription: 1,
+          thumbnail: 1,
+          price: 1,
+          isFree: 1,
+          level: 1,
+          category: 1,
+          avgRating: 1,
+          totalRatings: 1,
+          totalLessons: 1,
+          totalDuration: 1,
+          "teacher.firstName": 1,
+          "teacher.lastName": 1
+        }
+      },
+
+      { $sort: { createdAt: -1 } }
+    ]);
+
+    const result = await Course.aggregatePaginate(aggregate, {
+      page,
+      limit
+    });
+
+    res.json(result);
+
+  } catch (error) {
+    console.log("getAllCourses error:", error);
+    res.status(500).json({ message: "Server error" });
   }
+}
+
 
   /* =====================================================
      SEARCH + FILTER COURSES
