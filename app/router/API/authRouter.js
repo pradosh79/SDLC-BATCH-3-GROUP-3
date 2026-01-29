@@ -13,6 +13,7 @@ const about = require("../../controller/API/aboutApiController");
 const contact = require("../../controller/API/contactApiController");
 const ContactInfo=require("../../controller/API/contactInfoApiController");
 
+
 const AuthCheck = require('../../middleware/authCheck');
 
 const router = express.Router();
@@ -34,6 +35,12 @@ router.get("/courses/search", course.searchCourses);
 router.get("/courses/category/:name", course.getByCategory);
 router.get("/courses/popular", course.getPopularCourses);
 router.get("/courses/best-selling", course.getBestSellingCourses);
+router.get("/courses/allCategories",course.getCategories);
+router.get("/courses/studentView",course.homePageStudentViewCourses);
+
+router.get("/courses/getTrustedBy", course.getTrustedBy);
+router.get("/courses/testimonials", course.getTestimonials);
+
 router.get("/courses/:id", course.getCourseById);
 router.get("/courses/:id", course.getCourseDetails);
 

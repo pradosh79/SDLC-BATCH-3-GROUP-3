@@ -11,6 +11,8 @@ const categories = require("../controller/adminCategoryController");
 
 const about= require("../controller/aboutController");
 const adminContact = require("../controller/adminContactController");
+const trustedBy = require("../controller/adminTrustedByController");
+const testimonial = require("../controller/adminTestimonialController");
 
 const AuthCheckAdmin = require('../middleware/adminAuthCheck');
 
@@ -103,16 +105,22 @@ router.put("/about/update/:id", AuthCheckAdmin, about.update);
 // Delete by ID
 router.post("/about/delete/:id",  about.delete);
 
-
-// Trusted By
-router.get("/about/trustedby", about.trustedByPage);
-router.post("/about/trustedby/add", about.addTrustedBy);
-router.post("/about/trustedby/delete/:index", about.deleteTrustedBy);
+router.get("/about/trustedby", trustedBy.index);
+router.post("/about/trustedby", uploadImage.single("logo"), trustedBy.store);
+router.post("/about/trustedby/update/:id", uploadImage.single("logo"), trustedBy.update);
+router.get("/about/trustedby/delete/:id", trustedBy.delete);
 
 // Testimonials
-router.get("/about/testimonials", about.testimonialsPage);
-router.post("/about/testimonials/add", about.addTestimonial);
-router.get("/about/testimonials/delete/:id", about.deleteTestimonial);
+//router.get("/about/testimonials", about.testimonialsPage);
+//router.post("/about/testimonials/add", about.addTestimonial);
+//router.get("/about/testimonials/delete/:id", about.deleteTestimonial);
+
+//testimonial
+
+router.get("/about/testimonials", testimonial.index);
+router.post("/about/testimonials",uploadImage.single("image"), testimonial.store);
+router.post("/about/testimonials/update/:id", uploadImage.single("image"), testimonial.update);
+router.get("/about/testimonials/delete/:id", testimonial.delete );
 
 //adminContact
 // Contact messages

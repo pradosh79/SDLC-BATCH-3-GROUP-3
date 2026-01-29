@@ -1,7 +1,10 @@
 const Course = require("../../model/courseModel");
 const Lesson = require("../../model/lessonModel");
 const Rating = require("../../model/ratingModel"); // if using separate ratings
-const Enrollment = require("../../model/enrollmentModel"); // optional
+const Enrollment = require("../../model/enrollmentModel");
+const Category=require("../../model/categoryModel"); // optional
+const TrustedBy = require("../../model/trustedByModel");
+const Testimonial = require("../../model/testimonialModel");
 
 class CourseApiController {
 
@@ -226,6 +229,181 @@ async getCourseById(req, res){
     res.json({ success: true, data: course });
   } catch (err) {
     res.status(404).json({ success: false, message: "Course not found" });
+  }
+}
+
+// GET all categories (Public)
+async getCategories(req, res) {
+  try {
+    const categories = await Category.aggregate([
+      {
+        $match: { isActive: true }
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "_id",
+          foreignField: "category",
+          as: "courses"
+        }
+      },
+      {
+        $addFields: {
+          courses: {
+            $filter: {
+              input: "$courses",
+              as: "course",
+              cond: { $eq: ["$$course.isPublished", true] }
+            }
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "courses.teacher",
+          foreignField: "_id",
+          as: "teachers"
+        }
+      },
+      {
+        $addFields: {
+          courses: {
+            $map: {
+              input: "$courses",
+              as: "course",
+              in: {
+                _id: "$$course._id",
+                title: "$$course.title",
+                price: "$$course.price",
+                avgRating: "$$course.avgRating",
+                totalRatings: "$$course.totalRatings",
+                level: "$$course.level",
+                thumbnail: "$$course.thumbnail",
+
+                teacher: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$teachers",
+                        as: "t",
+                        cond: { $eq: ["$$t._id", "$$course.teacher"] }
+                      }
+                    },
+                    0
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+
+      // 📊 Count total courses
+      {
+        $addFields: {
+          totalCourses: { $size: "$courses" }
+        }
+      },
+
+      // 🧼 Clean response
+      {
+        $project: {
+          teachers: 0
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      data: categories
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to load categories"
+    });
+  }
+}
+
+async homePageStudentViewCourses(req, res) {
+    try {
+      const courses = await Course.aggregate([
+        {
+          $match: {
+            isPublished: true
+          }
+        },
+        {
+          $sort: {
+            enrolledCount: -1,     // popularity
+            avgRating: -1          // rating
+          }
+        },
+        {
+          $limit: 6               // only show 3–6 cards
+        },
+        {
+          $project: {
+            title: 1,
+            shortDescription: 1,
+            thumbnail: 1,
+            avgRating: 1,
+            totalRatings: 1,
+            enrolledCount: 1
+          }
+        }
+      ]);
+
+      res.json({
+        success: true,
+        data: courses
+      });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to load home courses"
+      });
+    }
+  }
+
+  async getTrustedBy(req, res) {
+  try {
+    const logos = await TrustedBy.find({ isActive: true })
+      .sort({ position: 1 })
+      .select("companyName logo website");
+
+    res.json({
+      success: true,
+      data: logos
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to load trusted by logos"
+    });
+  }
+}
+
+ async getTestimonials(req, res) {
+  try {
+    const testimonials = await Testimonial.find({ isActive: true })
+      .sort({ position: 1 })
+      .select("name role message rating image");
+
+    res.json({
+      success: true,
+      data: testimonials
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to load testimonials"
+    });
   }
 }
 

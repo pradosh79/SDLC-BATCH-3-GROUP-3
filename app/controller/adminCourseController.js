@@ -4,6 +4,7 @@ const cloudinary = require("../helper/cloudinary");
 const Category = require("../model/categoryModel");
 const deleteCloudinaryImage = require("../helper/deleteCloudinaryImage");
 
+
 class AdminCourseController {
 
   /* ============================
@@ -49,45 +50,39 @@ class AdminCourseController {
      STORE COURSE
   ============================ */
   async store(req, res) {
-    try {
+  try {
+    console.log("FILE:", req.file);
 
-      // multer attaches file here
-       console.log(req.file);
-
-       if (!req.file) {
-            return res.status(400).send("Image required");
-          }
-
-    // Upload to Cloudinary
-    const uploadResult = await uploadToCloudinary(
-          req.file.buffer,
-          "courses"
-        );
-
-      const course = new Course({
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        longDescription: req.body.longDescription || "",
-        teacher: req.body.teacher,
-        thumbnail: uploadResult.secure_url,
-        category: req.body.category,
-        level: req.body.level || "Beginner",
-        tags: req.body.tags ? req.body.tags.split(",") : [],
-        price: req.body.price || 0,
-        isFree: req.body.price == 0,
-        isPublished: req.body.isPublished === "on",
-        publishedAt: req.body.isPublished === "on" ? new Date() : null
-      });
-
-      await course.save();
-
-      res.redirect("/admin/courses");
-
-    } catch (error) {
-      console.log("Course create error:", error);
-      res.status(500).send("Course creation failed");
+    if (!req.file || !req.file.path) {
+      return res.status(400).send("Image required");
     }
+
+    const course = new Course({
+      title: req.body.title,
+      shortDescription: req.body.shortDescription,
+      longDescription: req.body.longDescription || "",
+      teacher: req.body.teacher,
+
+      // ✅ Cloudinary URL (already uploaded)
+      thumbnail: req.file.path,
+
+      category: req.body.category,
+      level: req.body.level || "Beginner",
+      tags: req.body.tags ? req.body.tags.split(",") : [],
+      price: req.body.price || 0,
+      isFree: req.body.price == 0,
+      isPublished: req.body.isPublished === "on",
+      publishedAt: req.body.isPublished === "on" ? new Date() : null
+    });
+
+    await course.save();
+    res.redirect("/admin/courses");
+
+  } catch (error) {
+    console.error("Course create error:", error);
+    res.status(500).send("Course creation failed");
   }
+}
 
   /* ============================
      EDIT FORM
@@ -182,7 +177,7 @@ async update(req, res) {
     console.error("Course delete error:", error);
     res.status(500).send("Delete failed");
   }
-}
+ }
 }
 
 module.exports = new AdminCourseController();
