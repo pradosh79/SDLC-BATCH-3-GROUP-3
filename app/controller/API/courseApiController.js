@@ -209,7 +209,11 @@ class CourseApiController {
 // GET best selling courses
 async getBestSellingCourses(req, res){
   try {
-    const courses = await Course.find({ isBestSeller: true });
+    const courses = await Course.find({ isPublished: true })
+    .sort({ totalEnrollments: -1 })
+    .limit(10)
+    .populate("category", "name")
+    .populate("teacher", "firstName lastName");
     res.json({ success: true, data: courses });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
