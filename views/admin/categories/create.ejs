@@ -1,0 +1,42 @@
+<%- include('../../partials/adminHeader', { title: "Add Course" }) %>
+
+<div id="wrapper">
+<%- include('../../partials/adminSidebar') %>
+
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+
+<%- include('../../partials/adminNavbar', { user: admin }) %>
+
+<div class="container mt-4">
+    <h2>Add Category</h2>
+
+  <form method="POST" action="/admin/categories">
+    <div class="mb-3">
+      <label>Name</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Description</label>
+      <textarea name="description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label>Icon</label>
+      <input type="text" name="icon" class="form-control">
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" name="isActive" class="form-check-input" checked>
+      <label class="form-check-label">Active</label>
+    </div>
+
+    <button class="btn btn-success">Save</button>
+  </form>
+</div>
+</div>
+
+<%- include('../../partials/adminFooter') %>
+</div>
+</div>

@@ -1,60 +1,112 @@
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+    id="accordionSidebar">
 
-    <!-- Sidebar Brand with Image -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center"
-       href="/admin/dashboard">
+  <!-- BRAND -->
+  <a class="sidebar-brand d-flex align-items-center justify-content-center"
+     href="/admin/dashboard">
+    <div class="sidebar-brand-icon">
+      <img src="/img/Logo.png" style="width:200px;">
+    </div>
+  </a>
 
-        <!-- Logo Image -->
-        <div class="sidebar-brand-icon">
-            <img src="/img/Logo.png" alt="Logo"
-              style="width:150px; height:150px; object-fit:contain;">
-            
-        </div>
+  <hr class="sidebar-divider my-0">
 
-        <!-- Brand Text -->
-        <!-- <div class="sidebar-brand-text mx-3">
-            Mini<sup>Upwork</sup>
-        </div> -->
+  <!-- DASHBOARD -->
+  <li class="nav-item <%= currentUrl === '/admin/dashboard' ? 'active' : '' %>">
+    <a class="nav-link" href="/admin/dashboard">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+
+  <!-- USERS -->
+  <li class="nav-item <%= currentUrl.startsWith('/admin/users') ? 'active' : '' %>">
+    <a class="nav-link" href="/admin/users">
+      <i class="fas fa-users"></i>
+      <span>Users</span>
+    </a>
+  </li>
+
+  <hr class="sidebar-divider">
+
+  <!-- COURSES -->
+  <% const courseMenuOpen =
+       currentUrl.startsWith('/admin/courses') ||
+       currentUrl.startsWith('/admin/categories') ||
+       currentUrl.startsWith('/admin/course-progress'); %>
+
+  <li class="nav-item <%= courseMenuOpen ? 'active' : '' %>">
+    <a class="nav-link collapsed"
+       href="#"
+       data-bs-toggle="collapse"
+       data-bs-target="#coursesMenu"
+       aria-expanded="<%= courseMenuOpen %>">
+      <i class="fas fa-book"></i>
+      <span>Courses</span>
     </a>
 
-    <hr class="sidebar-divider my-0">
+    <div id="coursesMenu"
+         class="collapse <%= courseMenuOpen ? 'show' : '' %>"
+         data-bs-parent="#accordionSidebar">
 
-    <!-- Dashboard -->
-    <li class="nav-item">
+      <div class="bg-white py-2 collapse-inner rounded">
 
-        <a class="nav-link" href="/admin/dashboard">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-        </a>
+        <h6 class="collapse-header">Courses</h6>
+        <a class="collapse-item <%= currentUrl === '/admin/courses' ? 'active' : '' %>"
+           href="/admin/courses">Course List</a>
 
-        <a class="nav-link" href="/admin/users">
-            <i class="fas fa-users"></i>
-            <span>Users</span>
-        </a>
+        <a class="collapse-item <%= currentUrl === '/admin/course-progress' ? 'active' : '' %>"
+           href="/admin/course-progress">Progress</a>
 
-        <a class="nav-link" href="/admin/courses">
-            <i class="fas fa-book"></i>
-            <span>Courses</span>
-        </a>
+        <div class="collapse-divider"></div>
 
-        <a class="nav-link" href="/admin/progress">
-            <i class="fas fa-chart-line"></i>
-            <span>Progress</span>
-        </a>
+        <h6 class="collapse-header">Categories</h6>
+        <a class="collapse-item <%= currentUrl === '/admin/categories' ? 'active' : '' %>"
+           href="/admin/categories">Category List</a>
+        <div class="collapse-divider"></div>
 
-        <a class="nav-link" href="/admin/about">
-            <i class="fas fa-chart-line"></i>
-            <span>About Us</span>
-        </a>
-        <a class="nav-link" href="/admin/contacts">
-            <i class="fas fa-chart-line"></i>
-            <span>Contacts</span>
-        </a>
+        
+      </div>
+    </div>
+  </li>
 
-        <a class="nav-link" href="/admin/contact-info">
-            <i class="fas fa-chart-line"></i>
-            <span>ContactInfo</span>
-        </a>
-    </li>
+  <hr class="sidebar-divider">
+
+  <!-- CMS -->
+  <% const cmsMenuOpen =
+       currentUrl.startsWith('/admin/about') ||
+       currentUrl.startsWith('/admin/contacts') ||
+       currentUrl.startsWith('/admin/contact-info'); %>
+
+  <li class="nav-item <%= cmsMenuOpen ? 'active' : '' %>">
+    <a class="nav-link collapsed"
+       href="#"
+       data-bs-toggle="collapse"
+       data-bs-target="#cmsMenu"
+       aria-expanded="<%= cmsMenuOpen %>">
+      <i class="fas fa-layer-group"></i>
+      <span>CMS</span>
+    </a>
+
+    <div id="cmsMenu"
+         class="collapse <%= cmsMenuOpen ? 'show' : '' %>"
+         data-bs-parent="#accordionSidebar">
+
+      <div class="bg-white py-2 collapse-inner rounded">
+        <h6 class="collapse-header">CMS</h6>
+
+        <a class="collapse-item <%= currentUrl === '/admin/about' ? 'active' : '' %>"
+           href="/admin/about">About Us</a>
+
+        <a class="collapse-item <%= currentUrl === '/admin/contacts' ? 'active' : '' %>"
+           href="/admin/contacts">Contacts</a>
+
+        <a class="collapse-item <%= currentUrl === '/admin/contact-info' ? 'active' : '' %>"
+           href="/admin/contact-info">Contact Info</a>
+      </div>
+    </div>
+  </li>
+
+  <hr class="sidebar-divider d-none d-md-block">
 
 </ul>

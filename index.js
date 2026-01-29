@@ -41,7 +41,9 @@ app.use('/uploads',express.static('uploads'));
 
 
 
-
+const adminViewMiddleware = require("./app/middleware/adminViewMiddleware");
+// Global admin view middleware
+app.use(adminViewMiddleware);
 // admin router
 const adminAuthRoute=require('./app/router/adminRoutes')
 app.use('/admin',adminAuthRoute)

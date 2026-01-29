@@ -1,0 +1,51 @@
+<%- include('../../partials/adminHeader', { title: "Add Course" }) %>
+
+<div id="wrapper">
+<%- include('../../partials/adminSidebar') %>
+
+<div id="content-wrapper" class="d-flex flex-column">
+<div id="content">
+
+<%- include('../../partials/adminNavbar', { user: admin }) %>
+
+<div class="container mt-4">
+   <div class="d-flex justify-content-between">
+    <h2>Categories</h2>
+    <a href="/admin/categories/create" class="btn btn-primary">Add Category</a>
+  </div>
+
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% categories.forEach(cat => { %>
+        <tr>
+          <td><%= cat.name %></td>
+          <td><%= cat.slug %></td>
+          <td>
+            <span class="badge <%= cat.isActive ? 'bg-success' : 'bg-danger' %>">
+              <%= cat.isActive ? 'Active' : 'Inactive' %>
+            </span>
+          </td>
+          <td>
+            <a href="/admin/categories/edit/<%= cat._id %>" class="btn btn-sm btn-warning">Edit</a>
+            <form method="POST" action="/admin/categories/delete/<%= cat._id %>" class="d-inline">
+              <button class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<%- include('../../partials/adminFooter') %>
+</div>
+</div>

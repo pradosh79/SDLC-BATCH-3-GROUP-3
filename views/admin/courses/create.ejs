@@ -25,9 +25,19 @@
             <% }) %>
           </select>
 
-          <input type="file" name="thumbnail" class="form-control mb-2" required>
+          <input type="file" name="thumbnail" class="form-control mb-2" accept="image/*" required>
+  
 
-          <input class="form-control mb-2" name="category" placeholder="Category">
+          <!-- <input class="form-control mb-2" name="category" placeholder="Category"> -->
+          <div class="mb-3">
+              <label class="form-label">Category</label>
+                  <select name="category" class="form-control mb-2" required>
+                      <option value="">-- Select Category --</option>
+                      <% categories.forEach(cat => { %>
+                      <option value="<%= cat._id %>"><%= cat.name %></option>
+                      <% }) %>
+                  </select>
+          </div>
 
           <select name="level" class="form-control mb-2">
             <option>Beginner</option>

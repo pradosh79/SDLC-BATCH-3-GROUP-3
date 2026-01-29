@@ -196,6 +196,35 @@ class CourseApiController {
       res.status(500).json({ message: "Failed to load related courses" });
     }
   }
+  
+  async getPopularCourses(req, res){
+  try {
+    const courses = await Course.find({ isPopular: true });
+    res.json({ success: true, data: courses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+// GET best selling courses
+async getBestSellingCourses(req, res){
+  try {
+    const courses = await Course.find({ isBestSeller: true });
+    res.json({ success: true, data: courses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+}
+
+async getCourseById(req, res){
+  try {
+    const course = await Course.findById(req.params.id);
+    res.json({ success: true, data: course });
+  } catch (err) {
+    res.status(404).json({ success: false, message: "Course not found" });
+  }
+}
+
 }
 
 module.exports = new CourseApiController();

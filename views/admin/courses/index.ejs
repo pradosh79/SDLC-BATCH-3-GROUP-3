@@ -19,6 +19,8 @@
           <thead>
             <tr>
               <th>Title</th>
+              <th>Thumbnil</th>
+              <th>Category</th>
               <th>Teacher</th>
               <th>Price</th>
               <th>Level</th>
@@ -31,6 +33,8 @@
             <% courses.forEach(c => { %>
               <tr>
                 <td><%= c.title %></td>
+                <td><img src="<%=c.thumbnail %>" width="120" /></td>
+                <td><%= c.category ? c.category.name : 'N/A' %></td>
                 <td><%= c.teacher?.firstName %></td>
                 <td>
                   <%= c.isFree ? "Free" : "₹" + c.price %>

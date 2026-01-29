@@ -51,11 +51,10 @@ const courseSchema = new Schema(
        CLASSIFICATION
     ============================ */
     category: {
-      type: String,
-      default: "General",
-      index: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "category",
+      required: true
     },
-
     level: {
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
@@ -141,6 +140,9 @@ const courseSchema = new Schema(
     publishedAt: {
       type: Date,
     },
+
+    isPopular: { type: Boolean, default: false },
+    isBestSeller: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

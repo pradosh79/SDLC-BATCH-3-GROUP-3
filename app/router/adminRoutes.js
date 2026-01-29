@@ -1,11 +1,13 @@
 const express= require('express');
 
 const upload = require("../middleware/videoUpload");
+const uploadImage=require("../middleware/imageUpload");
 const course = require("../controller/adminCourseController");
 const lesson = require("../controller/adminLessonController");
 const quiz = require("../controller/adminQuizController");
 const progress = require("../controller/adminProgressController");
 const admin = require("../controller/AdminController");
+const categories = require("../controller/adminCategoryController");
 
 const about= require("../controller/aboutController");
 const adminContact = require("../controller/adminContactController");
@@ -63,9 +65,9 @@ router.get("/dashboard", admin.dashboard);
 /* courses */
 router.get("/courses", course.index);
 router.get("/courses/create", course.createForm);
-router.post("/courses/create", upload.single('thumbnail'), course.store);
+router.post("/courses/create", uploadImage.single('thumbnail'), course.store);
 router.get("/courses/edit/:id", course.editForm);
-router.post("/courses/update/:id", upload.single('thumbnail'), course.update);
+router.post("/courses/update/:id", uploadImage.single('thumbnail'), course.update);
 router.get("/courses/delete/:id", course.delete);
 
 /* lessons */
@@ -120,6 +122,14 @@ router.post("/contacts/delete/:id", adminContact.deleteContact);
 // Contact info
 router.get("/contact-info", adminContact.contactInfoPage);
 router.post("/contact-info", adminContact.updateContactInfo);
+//Categories
+router.get("/categories", categories.index);
+router.get("/categories/create", categories.createPage);
+router.post("/categories", categories.store);
+router.get("/categories/edit/:id", categories.editPage);
+router.post("/categories/update/:id", categories.update);
+router.post("/categories/delete/:id", categories.destroy);
+
 
 
 

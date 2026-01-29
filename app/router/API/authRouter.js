@@ -33,6 +33,9 @@ router.get("/courses", course.getAllCourses);
 router.get("/courses/search", course.searchCourses);
 router.get("/courses/category/:name", course.getByCategory);
 router.get("/courses/:id", course.getCourseDetails);
+router.get("/courses/popular", course.getPopularCourses);
+router.get("/courses/best-selling", course.getBestSellingCourses);
+router.get("/courses/:id", course.getCourseById);
 
 
 //lesson
