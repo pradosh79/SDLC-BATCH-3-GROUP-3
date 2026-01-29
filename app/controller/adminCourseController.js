@@ -2,7 +2,6 @@ const Course = require("../model/courseModel");
 const User = require("../model/userModel");
 const cloudinary = require("../helper/cloudinary");
 const Category = require("../model/categoryModel");
-const uploadToCloudinary = require("../helper/uploadToCloudinary");
 const deleteCloudinaryImage = require("../helper/deleteCloudinaryImage");
 
 class AdminCourseController {
