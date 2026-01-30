@@ -12,6 +12,7 @@ const wishlist = require("../../controller/API/wishlistApiController");
 const about = require("../../controller/API/aboutApiController");
 const contact = require("../../controller/API/contactApiController");
 const ContactInfo=require("../../controller/API/contactInfoApiController");
+const Dashboard = require("../../controller/API/dashboardApiController");
 
 
 const AuthCheck = require('../../middleware/authCheck');
@@ -37,14 +38,17 @@ router.get("/courses/popular", course.getPopularCourses);
 router.get("/courses/best-selling", course.getBestSellingCourses);
 router.get("/courses/allCategories",course.getCategories);
 router.get("/courses/studentView",course.homePageStudentViewCourses);
-
 router.get("/courses/getTrustedBy", course.getTrustedBy);
 router.get("/courses/testimonials", course.getTestimonials);
 
+router.get("/courses/summary", AuthCheck, course.getAssignmentSummary);
+router.get("/courses/current", AuthCheck, course.getCurrentAssignments);
+router.post("/courses/:assignmentId/submit", AuthCheck, course.submitAssignment);
+router.get("/courses/search", AuthCheck, course.searchAssignments);
+router.get("/courses/upcoming", AuthCheck, course.getUpcomingAssignments);
+router.get("/courses/assignment/past", AuthCheck, course.getPastAssignments);
 router.get("/courses/:id", course.getCourseById);
 router.get("/courses/:id", course.getCourseDetails);
-
-
 //lesson
 router.get("/lessons/course/:courseId", lesson.getLessonsByCourse);
 //quiz
@@ -63,18 +67,27 @@ router.post("/rating", AuthCheck, rating.submit);
 router.get("/teacher/dashboard", AuthCheck, teacher.dashboard);
 //student
 router.get("/student/dashboard", AuthCheck, student.dashboard);
-
 //wishlist
 router.post("/toggle", AuthCheck, wishlist.toggle);
 router.get("/list", AuthCheck, wishlist.list);
-
 //about
 router.get("/about", about.list);
-
 //contact
 router.get("/contact", contact.createContact);
 //ContactInfo
 router.get("/contactInfo", ContactInfo.getContactInfo);
+
+
+//Dashboard
+router.get("/overview", AuthCheck, Dashboard.getOverview);
+router.get("/progress", AuthCheck, Dashboard.getProgress);
+router.get("/activity", AuthCheck, Dashboard.getActivity);
+router.get("/study-stats", AuthCheck, Dashboard.getStudyStats);
+router.get("/gauge", AuthCheck, Dashboard.getGauge);
+router.get("/mentors", AuthCheck, Dashboard.getMentors);
+router.get("/notifications", AuthCheck, Dashboard.getNotifications);
+
+
 
 module.exports = router;
 

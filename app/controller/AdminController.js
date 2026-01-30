@@ -8,30 +8,72 @@ const Enrollment = require("../model/enrollmentModel");
 class AdminController {
 
   async dashboard(req, res) {
-    try {
+  try {
 
-    // 🔢 Analytics counts
+    // 🔢 Analytics counts (YOUR EXISTING CODE)
     const totalStudents = await User.countDocuments({ role: "student" });
     const totalTeachers = await User.countDocuments({ role: "teacher" });
     const totalCourses  = await Course.countDocuments();
     const totalEnrollments = await Enrollment.countDocuments();
     const completedLessons = await Progress.countDocuments({ completed: true });
 
+    // ===============================
+    // 📊 BAR CHART: Students vs Teachers
+    // ===============================
+    const userChart = {
+      students: totalStudents,
+      teachers: totalTeachers
+    };
+
+    // ===============================
+    // 📈 LINE CHART: Monthly Enrollments
+    // ===============================
+    const enrollmentStats = await Enrollment.aggregate([
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          total: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const enrollmentChart = {
+      labels: enrollmentStats.map(
+        item => `${item._id.month}/${item._id.year}`
+      ),
+      data: enrollmentStats.map(item => item.total)
+    };
+
+    // ===============================
+    // 🎯 RENDER DASHBOARD
+    // ===============================
     res.render("admin/dashboard", {
       admin: req.user,
+
+      // cards
       stats: {
         totalStudents,
         totalTeachers,
         totalCourses,
         totalEnrollments,
         completedLessons
-      }
+      },
+
+      // charts
+      userChart,
+      enrollmentChart
     });
 
   } catch (error) {
     console.log("Dashboard error:", error);
+    res.status(500).send("Dashboard error");
   }
-  }
+}
+
 
   async login(req, res) {
     try {

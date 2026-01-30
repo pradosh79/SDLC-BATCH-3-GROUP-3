@@ -1,5 +1,8 @@
 <%- include('../partials/adminHeader', { title: 'mini upwork' }) %>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div id="wrapper">
 
     <%- include('../partials/adminSidebar') %>
@@ -8,59 +11,149 @@
 
         <div id="content">
 
-            <!-- FIXED: pass user properly -->
-            <%- include('../partials/adminNavbar', {user:admin}) %>
+            <!-- Navbar -->
+            <%- include('../partials/adminNavbar', { user: admin }) %>
 
             <div class="container-fluid">
-                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
-                        <div class="container mt-4">
-<div class="row">
+                <!-- ===================== -->
+                <!-- 🔢 STATS CARDS -->
+                <!-- ===================== -->
+                <div class="row">
 
-<div class="col-md-3">
-  <div class="card text-white bg-primary mb-3">
-    <div class="card-body">
-      <h5>Total Students</h5>
-      <h3><%= stats.totalStudents %></h3>
-    </div>
-  </div>
-</div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-body">
+                                <h5>Total Students</h5>
+                                <h3><%= stats.totalStudents %></h3>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="col-md-3">
-  <div class="card text-white bg-success mb-3">
-    <div class="card-body">
-      <h5>Total Teachers</h5>
-      <h3><%= stats.totalTeachers %></h3>
-    </div>
-  </div>
-</div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body">
+                                <h5>Total Teachers</h5>
+                                <h3><%= stats.totalTeachers %></h3>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="col-md-3">
-  <div class="card text-white bg-warning mb-3">
-    <div class="card-body">
-      <h5>Total Courses</h5>
-      <h3><%= stats.totalCourses %></h3>
-    </div>
-  </div>
-</div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-warning mb-3">
+                            <div class="card-body">
+                                <h5>Total Courses</h5>
+                                <h3><%= stats.totalCourses %></h3>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="col-md-3">
-  <div class="card text-white bg-danger mb-3">
-    <div class="card-body">
-      <h5>Enrollments</h5>
-      <h3><%= stats.totalEnrollments %></h3>
-    </div>
-  </div>
-</div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-danger mb-3">
+                            <div class="card-body">
+                                <h5>Enrollments</h5>
+                                <h3><%= stats.totalEnrollments %></h3>
+                            </div>
+                        </div>
+                    </div>
 
-</div>
-</div>
+                </div>
+
+                <!-- ===================== -->
+                <!-- 📊 CHARTS SECTION -->
+                <!-- ===================== -->
+                <div class="row mt-4">
+
+                    <!-- Bar Chart -->
+                    <div class="col-md-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    Users Distribution
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="userChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Chart -->
+                    <div class="col-md-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    Monthly Enrollments
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="enrollmentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
         <%- include('../partials/adminFooter') %>
+
     </div>
 
 </div>
+
+<!-- ===================== -->
+<!-- 📊 CHART SCRIPTS -->
+<!-- ===================== -->
+
+<script>
+/* BAR CHART: Students vs Teachers */
+const userCtx = document.getElementById("userChart");
+
+new Chart(userCtx, {
+    type: "bar",
+    data: {
+        labels: ["Students", "Teachers"],
+        datasets: [{
+            label: "Users",
+            data: [
+                <%= userChart.students %>,
+                <%= userChart.teachers %>
+            ],
+            backgroundColor: ["#4e73df", "#1cc88a"]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+</script>
+
+<script>
+/* LINE CHART: Monthly Enrollments */
+const enrollCtx = document.getElementById("enrollmentChart");
+
+new Chart(enrollCtx, {
+    type: "line",
+    data: {
+        labels: <%- JSON.stringify(enrollmentChart.labels) %>,
+        datasets: [{
+            label: "Enrollments",
+            data: <%- JSON.stringify(enrollmentChart.data) %>,
+            borderColor: "#f6c23e",
+            backgroundColor: "rgba(246, 194, 62, 0.15)",
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+</script>

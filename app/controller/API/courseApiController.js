@@ -5,6 +5,11 @@ const Enrollment = require("../../model/enrollmentModel");
 const Category=require("../../model/categoryModel"); // optional
 const TrustedBy = require("../../model/trustedByModel");
 const Testimonial = require("../../model/testimonialModel");
+const Assignment = require("../../model/assignment");
+const Submission = require("../../model/submission");
+
+
+
 
 class CourseApiController {
 
@@ -406,6 +411,344 @@ async homePageStudentViewCourses(req, res) {
     });
   }
 }
+
+async getAssignmentSummary(req, res){
+  try {
+    const studentId = req.user.id;
+    const now = new Date();
+
+    const totalAssignments = await Assignment.countDocuments();
+
+    const completed = await Submission.countDocuments({
+      studentId,
+      status: "completed"
+    });
+
+    const pending = await Submission.countDocuments({
+      studentId,
+      status: "pending"
+    });
+
+    const overdue = await Submission.countDocuments({
+      studentId,
+      status: "pending",
+      submittedAt: { $exists: false },
+    });
+
+    res.json({
+      totalAssignments,
+      completed,
+      pending,
+      overdue
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async getCurrentAssignments(req, res){
+  try {
+    const studentId = req.user.id;
+    const now = new Date();
+
+    const assignments = await Assignment.aggregate([
+      {
+        $lookup: {
+          from: "submissions",
+          let: { assignmentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$assignmentId", "$$assignmentId"] },
+                    { $eq: ["$studentId", mongoose.Types.ObjectId(studentId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "submission"
+        }
+      },
+      { $unwind: { path: "$submission", preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          dueDate: { $gte: now }
+        }
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          dueDate: 1,
+          status: { $ifNull: ["$submission.status", "pending"] },
+          score: "$submission.score"
+        }
+      }
+    ]);
+
+    res.json(assignments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async submitAssignment(req, res){
+  try {
+    const studentId = req.user.id;
+    const { assignmentId } = req.params;
+
+    // Check assignment exists
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({
+        message: "Assignment not found"
+      });
+    }
+
+    // Check existing submission
+    let submission = await Submission.findOne({
+      studentId,
+      assignmentId
+    });
+
+    if (submission && submission.status !== "pending") {
+      return res.status(400).json({
+        message: "Assignment already submitted"
+      });
+    }
+
+    // Create submission if not exists
+    if (!submission) {
+      submission = new Submission({
+        studentId,
+        assignmentId
+      });
+    }
+
+    submission.status = "submitted";
+    submission.submittedAt = new Date();
+
+    await submission.save();
+
+    res.status(200).json({
+      message: "Assignment submitted successfully",
+      submission
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async searchAssignments(req, res){
+  try {
+    const studentId = req.user.id;
+    const search = req.query.q || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const matchStage = {
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ]
+    };
+
+    const assignments = await Assignment.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "submissions",
+          let: { assignmentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$assignmentId", "$$assignmentId"] },
+                    { $eq: ["$studentId", mongoose.Types.ObjectId(studentId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "submission"
+        }
+      },
+      { $unwind: { path: "$submission", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          dueDate: 1,
+          status: { $ifNull: ["$submission.status", "pending"] },
+          score: "$submission.score"
+        }
+      },
+      { $sort: { dueDate: 1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const total = await Assignment.countDocuments(matchStage);
+
+    res.json({
+      data: assignments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async getUpcomingAssignments(req, res){
+  try {
+    const studentId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const skip = (page - 1) * limit;
+
+    const now = new Date();
+
+    const matchStage = {
+      dueDate: { $gt: now },
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ]
+    };
+
+    const assignments = await Assignment.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "submissions",
+          let: { assignmentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$assignmentId", "$$assignmentId"] },
+                    { $eq: ["$studentId", mongoose.Types.ObjectId(studentId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "submission"
+        }
+      },
+      { $unwind: { path: "$submission", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          dueDate: 1,
+          status: { $ifNull: ["$submission.status", "pending"] }
+        }
+      },
+      { $sort: { dueDate: 1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const total = await Assignment.countDocuments(matchStage);
+
+    res.json({
+      data: assignments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async getPastAssignments(req, res){
+  try {
+    const studentId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const skip = (page - 1) * limit;
+
+    const now = new Date();
+
+    const matchStage = {
+      dueDate: { $lt: now },
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ]
+    };
+
+    const assignments = await Assignment.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "submissions",
+          let: { assignmentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$assignmentId", "$$assignmentId"] },
+                    { $eq: ["$studentId", mongoose.Types.ObjectId(studentId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "submission"
+        }
+      },
+      { $unwind: { path: "$submission", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          dueDate: 1,
+          status: { $ifNull: ["$submission.status", "pending"] },
+          score: "$submission.score"
+        }
+      },
+      { $sort: { dueDate: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const total = await Assignment.countDocuments(matchStage);
+
+    res.json({
+      data: assignments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 
 }
 

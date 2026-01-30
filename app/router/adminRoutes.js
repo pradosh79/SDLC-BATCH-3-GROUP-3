@@ -110,13 +110,7 @@ router.post("/about/trustedby", uploadImage.single("logo"), trustedBy.store);
 router.post("/about/trustedby/update/:id", uploadImage.single("logo"), trustedBy.update);
 router.get("/about/trustedby/delete/:id", trustedBy.delete);
 
-// Testimonials
-//router.get("/about/testimonials", about.testimonialsPage);
-//router.post("/about/testimonials/add", about.addTestimonial);
-//router.get("/about/testimonials/delete/:id", about.deleteTestimonial);
-
 //testimonial
-
 router.get("/about/testimonials", testimonial.index);
 router.post("/about/testimonials",uploadImage.single("image"), testimonial.store);
 router.post("/about/testimonials/update/:id", uploadImage.single("image"), testimonial.update);
