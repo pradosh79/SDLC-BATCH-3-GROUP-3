@@ -6,9 +6,7 @@ const Progress = require("../../model/progressModel");
 // Optional (if you add them)
 const Activity = require("../../model/activityModel");
 const Notification = require("../../model/notificationModel");
-
-
-
+const Lesson = require("../../model/lessonModel");
 
 
 class DashboardApiController {
@@ -197,6 +195,148 @@ async getMentors(req, res){
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to load mentors" });
+  }
+}
+
+
+async dashboardProgress(req, res){
+  try {
+    const userId = req.user.id;
+
+    /* ===============================
+       1. Weekly Study Goal
+    =============================== */
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 7);
+
+    const weeklyStudy = await Progress.aggregate([
+      {
+        $match: {
+          user: userId,
+          updatedAt: { $gte: weekStart }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalMinutes: { $sum: "$watchTime" }
+        }
+      }
+    ]);
+
+    const weeklyHours =
+      (weeklyStudy[0]?.totalMinutes || 0) / 60;
+
+    const weeklyGoal = 10; // configurable
+
+    /* ===============================
+       2. Total Courses Completed
+    =============================== */
+    const completedCourses =
+      await Enrollment.countDocuments({
+        user: userId,
+        completed: true
+      });
+
+    /* ===============================
+       3. My Current Courses
+    =============================== */
+    const currentCourses = await Enrollment.find({
+      user: userId
+    })
+      .populate("course", "title thumbnail")
+      .select("progress completed");
+
+    /* ===============================
+       4. Learning Progress
+    =============================== */
+    const progressAgg = await Enrollment.aggregate([
+      { $match: { user: userId } },
+      {
+        $group: {
+          _id: null,
+          avgProgress: { $avg: "$progress" }
+        }
+      }
+    ]);
+
+    const learningProgress =
+      Math.round(progressAgg[0]?.avgProgress || 0);
+
+    /* ===============================
+       5. Skill Progress
+       (Example: IT vs Non-IT)
+    =============================== */
+    const skillAgg = await Enrollment.aggregate([
+      {
+        $lookup: {
+          from: "courses",
+          localField: "course",
+          foreignField: "_id",
+          as: "course"
+        }
+      },
+      { $unwind: "$course" },
+      {
+        $group: {
+          _id: "$course.category",
+          progress: { $avg: "$progress" }
+        }
+      }
+    ]);
+
+    /* ===============================
+       6. Overall Progress
+    =============================== */
+    const overallProgress = learningProgress;
+
+    /* ===============================
+       7. Upcoming Courses
+    =============================== */
+    const upcomingCourses = await Enrollment.find({
+      user: userId,
+      progress: { $lt: 100 }
+    })
+      .populate("course", "title")
+      .limit(5);
+
+    /* ===============================
+       8. Upcoming Lessons
+    =============================== */
+    const upcomingLessons = await Lesson.find({
+      isPublished: true
+    })
+      .sort({ order: 1 })
+      .limit(5)
+      .select("title course");
+
+    /* ===============================
+       9. Recent Activity
+    =============================== */
+    const activities = await Activity.find({
+      user: userId
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      weeklyStudyGoal: {
+        goalHours: weeklyGoal,
+        completedHours: weeklyHours
+      },
+      fundamentals: learningProgress,
+      totalCoursesCompleted: completedCourses,
+      currentCourses,
+      learningProgress,
+      skillProgress: skillAgg,
+      overallProgress,
+      upcomingCourses,
+      upcomingLessons,
+      recentActivity: activities
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
 

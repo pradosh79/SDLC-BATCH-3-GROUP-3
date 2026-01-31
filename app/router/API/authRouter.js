@@ -15,6 +15,8 @@ const ContactInfo=require("../../controller/API/contactInfoApiController");
 const Dashboard = require("../../controller/API/dashboardApiController");
 
 
+
+
 const AuthCheck = require('../../middleware/authCheck');
 
 const router = express.Router();
@@ -29,7 +31,6 @@ router.post('/reset-password/:id/:token', authController.resetPassword);
 //auth protected route
 router.post('/update-password', AuthCheck, authController.updatePassword)
 router.get('/dashboard', AuthCheck, authController.Dashboard)
-
 //course
 router.get("/courses", course.getAllCourses);
 router.get("/courses/search", course.searchCourses);
@@ -86,6 +87,7 @@ router.get("/study-stats", AuthCheck, Dashboard.getStudyStats);
 router.get("/gauge", AuthCheck, Dashboard.getGauge);
 router.get("/mentors", AuthCheck, Dashboard.getMentors);
 router.get("/notifications", AuthCheck, Dashboard.getNotifications);
+router.get("/dashboard/progress", AuthCheck, Dashboard.dashboardProgress);
 
 
 
