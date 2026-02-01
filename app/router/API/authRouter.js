@@ -80,15 +80,15 @@ router.get("/contactInfo", ContactInfo.getContactInfo);
 
 
 //Dashboard
-router.get("/overview", AuthCheck, Dashboard.getOverview);
-router.get("/progress", AuthCheck, Dashboard.getProgress);
-router.get("/activity", AuthCheck, Dashboard.getActivity);
-router.get("/study-stats", AuthCheck, Dashboard.getStudyStats);
-router.get("/gauge", AuthCheck, Dashboard.getGauge);
-router.get("/mentors", AuthCheck, Dashboard.getMentors);
-router.get("/notifications", AuthCheck, Dashboard.getNotifications);
-router.get("/dashboard/progress", AuthCheck, Dashboard.dashboardProgress);
-router.get("/student/course-dashboard",AuthCheck, Dashboard.courseDashboard);
+router.get("/overview",  Dashboard.getOverview);
+router.get("/progress",  Dashboard.getProgress);
+router.get("/activity",  Dashboard.getActivity);
+router.get("/study-stats", Dashboard.getStudyStats);
+router.get("/gauge", Dashboard.getGauge);
+router.get("/mentors", Dashboard.getMentors);
+router.get("/notifications", Dashboard.getNotifications);
+router.get("/dashboard/progress", Dashboard.dashboardProgress);
+router.get("/student/course-dashboard", Dashboard.courseDashboard);
 
 
 
