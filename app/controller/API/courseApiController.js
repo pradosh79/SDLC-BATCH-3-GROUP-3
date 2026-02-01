@@ -16,13 +16,13 @@ class CourseApiController {
   /* =====================================================
      GET ALL COURSES (HOME PAGE / COURSE LIST)
   ===================================================== */
-  async getAllCourses(req, res) {
+async getAllCourses(req, res) {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
 
     const aggregate = Course.aggregate([
-      // 🔥 TEMP: NO MATCH
+      /* ================= LOOKUP TEACHER ================= */
       {
         $lookup: {
           from: "users",
@@ -31,26 +31,36 @@ class CourseApiController {
           as: "teacher"
         }
       },
+
       {
         $unwind: {
           path: "$teacher",
           preserveNullAndEmptyArrays: true
         }
       },
+
+      /* ================= FINAL PROJECTION ================= */
       {
         $project: {
           title: 1,
-          shortDescription: 1,
-          thumbnail: 1,
-          price: 1,
-          isFree: 1,
-          level: 1,
+          shortDescription: { $ifNull: ["$shortDescription", ""] },
+          thumbnail: { $ifNull: ["$thumbnail", ""] },
+          level: { $ifNull: ["$level", "Beginner"] },
+          price: { $ifNull: ["$price", 0] },
+          isFree: { $ifNull: ["$isFree", false] },
+          category: 1,
+          avgRating: { $ifNull: ["$avgRating", 0] },
+          totalRatings: { $ifNull: ["$totalRatings", 0] },
+          totalLessons: { $ifNull: ["$totalLessons", 0] },
+          totalDuration: { $ifNull: ["$totalDuration", "0h"] },
           teacher: {
             firstName: "$teacher.firstName",
             lastName: "$teacher.lastName"
           }
         }
-      }
+      },
+
+      { $sort: { createdAt: -1 } }
     ]);
 
     const result = await Course.aggregatePaginate(aggregate, {
@@ -61,7 +71,7 @@ class CourseApiController {
     res.json(result);
 
   } catch (error) {
-    console.error(error);
+    console.error("getAllCourses error:", error);
     res.status(500).json({ message: error.message });
   }
 }
