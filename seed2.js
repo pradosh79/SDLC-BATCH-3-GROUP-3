@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs"); // fallback if needed
 
-mongoose.connect("mongodb+srv://earthpradosh:TbSO5iW0LSoEgxu1@cluster0.okrttmy.mongodb.net/elarning");
+mongoose.connect("mongodb+srv://earthpradosh:TbSO5iW0LSoEgxu1@cluster0.okrttmy.mongodb.net/elearning");
 
 const ObjectId = mongoose.Types.ObjectId;
 

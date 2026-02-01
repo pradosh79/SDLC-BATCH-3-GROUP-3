@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const trustedBySchema = new mongoose.Schema(
+const trustedbySchema = new mongoose.Schema(
   {
     companyName: {
       type: String,
@@ -31,4 +31,8 @@ const trustedBySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("TrustedBy", trustedBySchema);
+module.exports = mongoose.model(
+  "TrustedBy",
+  trustedbySchema,
+  "trusted_by" // 👈 explicit collection name
+);
