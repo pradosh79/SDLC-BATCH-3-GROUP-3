@@ -22,19 +22,21 @@ class CourseApiController {
     const limit = 6;
 
     const aggregate = Course.aggregate([
-      { $match: { isPublished: true } },
-
+      // 🔥 TEMP: NO MATCH
       {
         $lookup: {
-          from: "users",              // MongoDB collection name
+          from: "users",
           localField: "teacher",
           foreignField: "_id",
           as: "teacher"
         }
       },
-
-      { $unwind: "$teacher" },
-
+      {
+        $unwind: {
+          path: "$teacher",
+          preserveNullAndEmptyArrays: true
+        }
+      },
       {
         $project: {
           title: 1,
@@ -43,17 +45,12 @@ class CourseApiController {
           price: 1,
           isFree: 1,
           level: 1,
-          category: 1,
-          avgRating: 1,
-          totalRatings: 1,
-          totalLessons: 1,
-          totalDuration: 1,
-          "teacher.firstName": 1,
-          "teacher.lastName": 1
+          teacher: {
+            firstName: "$teacher.firstName",
+            lastName: "$teacher.lastName"
+          }
         }
-      },
-
-      { $sort: { createdAt: -1 } }
+      }
     ]);
 
     const result = await Course.aggregatePaginate(aggregate, {
@@ -64,10 +61,11 @@ class CourseApiController {
     res.json(result);
 
   } catch (error) {
-    console.log("getAllCourses error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 }
+
 
 
   /* =====================================================

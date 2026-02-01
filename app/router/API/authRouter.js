@@ -88,6 +88,7 @@ router.get("/gauge", AuthCheck, Dashboard.getGauge);
 router.get("/mentors", AuthCheck, Dashboard.getMentors);
 router.get("/notifications", AuthCheck, Dashboard.getNotifications);
 router.get("/dashboard/progress", AuthCheck, Dashboard.dashboardProgress);
+router.get("/student/course-dashboard",AuthCheck, Dashboard.courseDashboard);
 
 
 

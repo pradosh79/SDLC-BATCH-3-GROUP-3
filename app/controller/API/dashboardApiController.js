@@ -7,6 +7,7 @@ const Progress = require("../../model/progressModel");
 const Activity = require("../../model/activityModel");
 const Notification = require("../../model/notificationModel");
 const Lesson = require("../../model/lessonModel");
+const Rating = require("../../model/ratingModel");
 
 
 class DashboardApiController {
@@ -337,6 +338,97 @@ async dashboardProgress(req, res){
 
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+}
+
+async courseDashboard(req, res) {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    /* ================= USER INFO ================= */
+    const user = await User.findById(userId).select(
+      "firstName lastName role"
+    );
+
+    /* ================= ENROLLED COURSES ================= */
+    const enrollments = await Enrollment.find({ user: userId })
+      .populate({
+        path: "course",
+        populate: {
+          path: "teacher",
+          select: "firstName lastName"
+        }
+      });
+
+    const allCourses = enrollments
+      .filter(e => e.course) // 🚨 IMPORTANT
+      .map(e => ({
+        _id: e.course._id,
+        title: e.course.title || "Untitled Course",
+        thumbnail: e.course.thumbnail || "",
+        duration: "2hr 10min",
+        chapters: 10,
+        videos: 15,
+        progress: e.progress ?? 0,
+        teacher: e.course.teacher
+          ? `${e.course.teacher.firstName ?? ""} ${e.course.teacher.lastName ?? ""}`.trim()
+          : "Unknown Instructor"
+      }));
+
+    const ongoing = allCourses.filter(c => c.progress < 100);
+    const completed = allCourses.filter(c => c.progress === 100);
+
+    /* ================= POPULAR COURSES ================= */
+    const popularCourses = await Course.aggregate([
+      {
+        $lookup: {
+          from: "ratings",
+          localField: "_id",
+          foreignField: "course",
+          as: "ratings"
+        }
+      },
+      {
+        $addFields: {
+          avgRating: { $ifNull: [{ $avg: "$ratings.rating" }, 0] }
+        }
+      },
+      { $sort: { avgRating: -1 } },
+      { $limit: 5 },
+      {
+        $project: {
+          title: 1,
+          thumbnail: 1
+        }
+      }
+    ]);
+
+    /* ================= FINAL RESPONSE ================= */
+    res.json({
+      user: {
+        name: user ? `Hi ${user.firstName}` : "Hi Learner",
+        subtitle: "Lets learn something new today."
+      },
+      stats: {
+        totalCourses: allCourses.length,
+        completedCourses: completed.length,
+        ongoingCourses: ongoing.length
+      },
+      courses: {
+        all: allCourses,
+        ongoing,
+        completed
+      },
+      popularCourses
+    });
+
+  } catch (error) {
+    console.error("Dashboard Error:", error);
+    res.status(500).json({ error: error.message });
   }
 }
 
