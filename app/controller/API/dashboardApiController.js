@@ -21,31 +21,53 @@ async getMe(req, res){
   }
 }
 
-async getOverview(req, res){
-  try{
+async getOverview(req, res) {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: user not found"
+      });
+    }
+
     const enrollment = await Enrollment.findOne({
-    user: req.user._id
-  }).populate("course");
+      user: req.user._id,
+      status: "active"
+    }).populate("course");
 
-  if (!enrollment) {
-    return res.json(null);
-  }
+    if (!enrollment || !enrollment.course) {
+      return res.json({
+        courseTitle: null,
+        duration: null,
+        chapters: 0,
+        videos: 0,
+        completion: 0
+      });
+    }
 
-  const progress = await Progress.findOne({
-    user: req.user._id,
-    course: enrollment.course._id
-  });
+    const completedLessons = await Progress.countDocuments({
+      user: req.user._id,
+      course: enrollment.course._id,
+      completed: true
+    });
 
-  res.json({
-    courseTitle: enrollment.course.title,
-    duration: enrollment.course.duration,
-    chapters: enrollment.course.totalChapters,
-    videos: enrollment.course.totalVideos,
-    completion: progress ? progress.percentage : 0
-  });
+    const totalLessons = enrollment.course.totalLessons || 0;
 
-  }catch (error) {
-    console.log("getAllCourses error:", error);
+    const completion =
+      totalLessons > 0
+        ? Math.round((completedLessons / totalLessons) * 100)
+        : 0;
+
+    res.json({
+      courseTitle: enrollment.course.title,
+      duration: enrollment.course.totalDuration || "0h",
+      chapters: totalLessons,
+      videos: totalLessons,
+      completion
+    });
+
+  } catch (error) {
+    console.error("getOverview error:", error);
     res.status(500).json({ message: "Server error" });
   }
 }
@@ -343,7 +365,7 @@ async dashboardProgress(req, res){
 
 async courseDashboard(req, res) {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id; // ✅ FIX 1
 
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
@@ -364,26 +386,43 @@ async courseDashboard(req, res) {
         }
       });
 
-    const allCourses = enrollments
-      .filter(e => e.course) // 🚨 IMPORTANT
-      .map(e => ({
+    const allCourses = [];
+
+    for (const e of enrollments) {
+      if (!e.course) continue;
+
+      const completedLessons = await Progress.countDocuments({
+        user: userId,
+        course: e.course._id,
+        completed: true
+      });
+
+      const totalLessons = e.course.totalLessons || 0;
+      const progress =
+        totalLessons > 0
+          ? Math.round((completedLessons / totalLessons) * 100)
+          : 0;
+
+      allCourses.push({
         _id: e.course._id,
         title: e.course.title || "Untitled Course",
         thumbnail: e.course.thumbnail || "",
-        duration: "2hr 10min",
-        chapters: 10,
-        videos: 15,
-        progress: e.progress ?? 0,
+        duration: e.course.totalDuration || "0h",
+        chapters: totalLessons,
+        videos: totalLessons,
+        progress,
         teacher: e.course.teacher
-          ? `${e.course.teacher.firstName ?? ""} ${e.course.teacher.lastName ?? ""}`.trim()
+          ? `${e.course.teacher.firstName || ""} ${e.course.teacher.lastName || ""}`.trim()
           : "Unknown Instructor"
-      }));
+      });
+    }
 
     const ongoing = allCourses.filter(c => c.progress < 100);
     const completed = allCourses.filter(c => c.progress === 100);
 
     /* ================= POPULAR COURSES ================= */
     const popularCourses = await Course.aggregate([
+      { $match: { isPublished: true } },
       {
         $lookup: {
           from: "ratings",

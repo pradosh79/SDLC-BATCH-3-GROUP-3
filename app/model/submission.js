@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const submissionSchema = new mongoose.Schema({
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "User"
   },
   assignmentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "assignment"
+    ref: "Assignment"
   },
   status: {
     type: String,

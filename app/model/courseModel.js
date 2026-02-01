@@ -30,7 +30,7 @@ const courseSchema = new Schema(
     ============================ */
     teacher: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
       required: true,
       index: true,
     },
