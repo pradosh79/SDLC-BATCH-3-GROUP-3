@@ -225,14 +225,61 @@ async getAllCourses(req, res) {
 // GET best selling courses
 async getBestSellingCourses(req, res){
   try {
-    const courses = await Course.find({ isPublished: true })
-    .sort({ totalEnrollments: -1 })
-    .limit(10)
-    .populate("category", "name")
-    .populate("teacher", "firstName lastName");
+    const courses = await Enrollment.aggregate([
+      {
+        $group: {
+          _id: "$course",
+          totalEnrollments: { $sum: 1 }
+        }
+      },
+      { $sort: { totalEnrollments: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "_id",
+          foreignField: "_id",
+          as: "course"
+        }
+      },
+      { $unwind: "$course" },
+      { $match: { "course.isPublished": true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "course.teacher",
+          foreignField: "_id",
+          as: "teacher"
+        }
+      },
+      { $unwind: "$teacher" },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "course.category",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      { $unwind: "$category" },
+      {
+        $project: {
+          title: "$course.title",
+          thumbnail: "$course.thumbnail",
+          totalEnrollments: 1,
+          teacher: {
+            firstName: "$teacher.firstName",
+            lastName: "$teacher.lastName"
+          },
+          category: "$category.name"
+        }
+      }
+    ]);
+
     res.json({ success: true, data: courses });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("getBestSellingCourses:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 }
 
